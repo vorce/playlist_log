@@ -1,0 +1,3 @@
+<div>
+<%= content_tag :a, @artist["name"], href: @artist["uri"] %>
+</div>

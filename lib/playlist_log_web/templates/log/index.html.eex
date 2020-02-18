@@ -1,0 +1,30 @@
+<h1>Listing Logs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Track count</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for log <- @logs do %>
+    <tr>
+      <td><%= content_tag :p, log.name %></td>
+      <td><%= content_tag :p, log.description %></td>
+      <td><%= log.track_count %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.log_path(@conn, :show, log) %></span>
+        <span><%= link "Edit", to: Routes.log_path(@conn, :edit, log) %></span>
+        <span><%= link "Delete", to: Routes.log_path(@conn, :delete, log), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Log", to: Routes.log_path(@conn, :new) %></span>

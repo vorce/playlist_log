@@ -1,0 +1,17 @@
+<tr>
+    <td><%= content_tag :a, @track.name, href: @track.uri %></td>
+    <td><%= for artist <- @track.artists do
+            render "artist.html", artist: artist
+        end %>
+    </td>
+    <td><%= render "album.html", album: @track.album %></td>
+    <td><%=
+        duration_s = max(@track.duration_ms || 0, 0) / 1_000
+        content_tag :time, duration_s, datetime: "PT#{duration_s}S"
+        %>
+    </td>
+
+    <td>
+    <span><%= link "Delete", to: "#", method: :delete, data: [confirm: "Are you sure?"] %></span>
+    </td>
+</tr>

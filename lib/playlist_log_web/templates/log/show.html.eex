@@ -1,0 +1,23 @@
+<h2>LOG: <%= @log.name %></h2>
+<%= content_tag :p, @log.description %>
+
+<h3>Current tracks</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Artist</th>
+      <th>Album</th>
+      <th>🕒</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for track <- @log.tracks do
+  render "track.html", track: track    
+end %>
+  </tbody>
+</table>
+
+<span><%= link "Edit", to: Routes.log_path(@conn, :edit, @log) %></span>
+<span><%= link "Back", to: Routes.log_path(@conn, :index) %></span>
