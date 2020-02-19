@@ -5,7 +5,8 @@
     <tr>
       <th>Name</th>
       <th>Description</th>
-      <th>Track count</th>
+      <th>Tracks</th>
+      <th>Events</th>
 
       <th></th>
     </tr>
@@ -16,6 +17,7 @@
       <td><%= content_tag :p, log.name %></td>
       <td><%= content_tag :p, log.description %></td>
       <td><%= log.track_count %></td>
+      <td><%= log.event_count %></td>
 
       <td>
         <span><%= link "Show", to: Routes.log_path(@conn, :show, log) %></span>

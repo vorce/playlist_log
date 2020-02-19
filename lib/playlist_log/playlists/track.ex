@@ -10,6 +10,8 @@ defmodule PlaylistLog.Playlists.Track do
     field(:album, :map)
     field(:duration_ms, :integer)
     field(:uri, :string)
+    field(:added_at, :utc_datetime)
+    field(:added_by, :string)
   end
 
   @doc false
@@ -21,6 +23,10 @@ defmodule PlaylistLog.Playlists.Track do
 
   def new(raw_track) do
     # IO.inspect(raw_track, label: "raw_track")
+    {:ok, added_at, _} =
+      raw_track
+      |> Map.get("added_at", "2000-01-01T01:01:01Z")
+      |> DateTime.from_iso8601()
 
     %__MODULE__{
       name: get_in(raw_track, ["track", "name"]),
@@ -28,7 +34,9 @@ defmodule PlaylistLog.Playlists.Track do
       album: get_in(raw_track, ["track", "album"]),
       duration_ms: get_in(raw_track, ["track", "duration_ms"]),
       id: get_in(raw_track, ["track", "id"]),
-      uri: get_in(raw_track, ["track", "uri"])
+      uri: get_in(raw_track, ["track", "uri"]),
+      added_at: added_at,
+      added_by: get_in(raw_track, ["added_by", "id"])
     }
   end
 end

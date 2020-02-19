@@ -12,14 +12,14 @@ defmodule PlaylistLog.Repo do
   def get(Log = module, id) do
     with %Log{} = log <- CubDB.get(@cubdb, key(module, id), :no_such_log),
          {:ok, events} <- CubDB.select(@cubdb, select_keys(Event, log.id)) do
-      {:ok, %Log{log | events: events}}
+      {:ok, %Log{log | events: events, event_count: length(events)}}
     else
       :no_such_log -> {:error, {:no_such_resource, id}}
     end
   end
 
-  def get(Event = module, id) do
-    CubDB.select(@cubdb, select_keys(module, id))
+  def get(Event = module, log_id) do
+    CubDB.select(@cubdb, select_keys(module, log_id))
   end
 
   def insert(Log = module, user_id, logs) do

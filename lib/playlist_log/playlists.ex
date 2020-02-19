@@ -6,6 +6,7 @@ defmodule PlaylistLog.Playlists do
   import Ecto.Query, warn: false
   alias PlaylistLog.Repo
 
+  alias PlaylistLog.Playlists.Event
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
   alias PlaylistLog.Spotify
@@ -23,7 +24,7 @@ defmodule PlaylistLog.Playlists do
     # TODO what about old ones in db, but no longer in spotify?
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, playlists} <- Spotify.get_playlists(access_token),
-         logs <- Enum.map(playlists, &Log.new(&1, user_id)),
+         logs <- Enum.map(playlists, &Log.new(&1, fetched_by: user_id)),
          :ok <- Repo.insert(Log, user_id, logs) do
       {:ok, logs}
     end
@@ -47,10 +48,27 @@ defmodule PlaylistLog.Playlists do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, log} <- Repo.get(Log, {user_id, id}),
          {:ok, raw_tracks} <- Spotify.get_playlist_tracks(access_token, id),
-         tracks <- Enum.map(raw_tracks, &Track.new/1) |> IO.inspect(label: "track structs") do
-      # TODO: create Track schema, and convert response from spotify raw track maps to Tracks
-      {:ok, %Log{log | tracks: tracks}}
+         tracks <- Enum.map(raw_tracks, &Track.new/1),
+         combined_events <- combine_events(tracks, log.events) do
+      {:ok,
+       %Log{
+         log
+         | tracks: tracks,
+           track_count: length(tracks),
+           events: combined_events,
+           event_count: length(combined_events)
+       }}
     end
+  end
+
+  defp combine_events(tracks, events) do
+    track_added_events = Enum.map(tracks, &Event.from_track/1)
+
+    events
+    |> Enum.concat(track_added_events)
+    |> Enum.uniq_by(fn event ->
+      {event.timestamp, event.user, event.type, event.track.id}
+    end)
   end
 
   @doc """

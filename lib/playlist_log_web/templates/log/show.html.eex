@@ -19,5 +19,29 @@ end %>
   </tbody>
 </table>
 
+<h3>Events</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Timestamp</th>
+      <th>Type</th>
+      <th>Track</th>
+      <th>User</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for event <- Enum.sort(@log.events, fn a, b ->
+    case DateTime.compare(a.timestamp, b.timestamp) do
+      :lt -> false
+      :gt -> true
+      _ -> true
+    end
+  end) do
+  render "event.html", event: event
+end %>
+  </tbody>
+</table>
+
 <span><%= link "Edit", to: Routes.log_path(@conn, :edit, @log) %></span>
 <span><%= link "Back", to: Routes.log_path(@conn, :index) %></span>

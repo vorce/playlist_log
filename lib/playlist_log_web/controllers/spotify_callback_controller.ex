@@ -9,7 +9,6 @@ defmodule PlaylistLogWeb.SpotifyCallbackController do
       |> put_session(:spotify_user, user_info)
       |> put_flash(:info, "Successfully authenticated with Spotify")
       |> redirect(to: Routes.log_path(conn, :index))
-      |> IO.inspect(label: "conn after SpotifyCallbackController.authenticate")
     else
       {:error, reason, conn} ->
         conn

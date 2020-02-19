@@ -12,6 +12,7 @@ defmodule PlaylistLog.Playlists.Log do
     field(:collaborative, :boolean)
     field(:owner_id, :string)
     field(:fetched_by, :string)
+    field(:event_count, :integer, default: 0)
 
     has_many(:events, Event)
     has_many(:tracks, Track)
@@ -31,12 +32,13 @@ defmodule PlaylistLog.Playlists.Log do
       :external_id,
       :collaborative,
       :owner_id,
-      :fetched_by
+      :fetched_by,
+      :event_count
     ])
     |> validate_required(@required_keys)
   end
 
-  def new(map, fetched_by \\ nil) do
+  def new(map, opts \\ []) do
     external_id = map["id"]
 
     %__MODULE__{
@@ -47,7 +49,8 @@ defmodule PlaylistLog.Playlists.Log do
       collaborative: map["collaborative"],
       owner_id: get_in(map, ["owner", "id"]),
       id: external_id,
-      fetched_by: fetched_by
+      fetched_by: Keyword.get(opts, :fetched_by),
+      event_count: Keyword.get(opts, :event_count, 0)
     }
   end
 end

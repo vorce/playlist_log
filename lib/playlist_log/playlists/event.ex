@@ -4,19 +4,31 @@ defmodule PlaylistLog.Playlists.Event do
 
   alias PlaylistLog.Playlists.Track
 
+  @track_added "TRACK_ADDED"
+
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "events" do
-    field(:name, :string)
-    has_one(:track, Track)
+    field(:timestamp, :utc_datetime)
+    field(:type, :string)
+    field(:user, :string)
 
-    timestamps()
+    has_one(:track, Track)
   end
 
   @doc false
-  def changeset(track, attrs) do
-    track
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+  def changeset(event, attrs) do
+    event
+    |> cast(attrs, [:timstamp, :type, :user])
+    |> validate_required([:timestamp, :type, :user])
+  end
+
+  def from_track(%Track{} = track) do
+    %__MODULE__{
+      track: track,
+      user: track.added_by,
+      timestamp: track.added_at,
+      type: @track_added
+    }
   end
 end

@@ -6,8 +6,8 @@ A log / timeline of song additions and removals for a Spotify playlist.
 
 - Sign in to spotify
 - Select playlist
-- Show current songs in playlist + any removed ones (with metadata of when, name etc)
-- Present options to delete and add songs to the playlist
+- Show current songs in playlist + show events for the playlist (events are either additions or removals of tracks to the playlist)
+- Present options to delete and add songs to the playlist, doing this will create new events in the log for that playlist.
 
 
 ## Storage details
@@ -16,8 +16,12 @@ CubDB
 
 https://hexdocs.pm/cubdb/howto.html
 
-{:playlist, id, date} => [%Event{}, %Event{}]
-
+```elixir
+%{
+  {:log, user_id, log_id} => %Log{}
+  {:event, log_id, Date} => [%Event{}, %Event{}]
+}
+```
 
 ---
 
