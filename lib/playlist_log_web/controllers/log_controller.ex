@@ -89,4 +89,27 @@ defmodule PlaylistLogWeb.LogController do
     |> put_flash(:info, "Log deleted successfully.")
     |> redirect(to: Routes.log_path(conn, :index))
   end
+
+  def delete_track(conn, %{
+        "log_id" => log_id,
+        "snapshot_id" => snapshot_id,
+        "track_uri" => track_uri
+      }) do
+    spotify_user = get_session(conn, :spotify_user)
+    spotify_access_token = conn.cookies["spotify_access_token"]
+
+    with {:ok, log} <- Playlists.get_log(spotify_user, log_id, spotify_access_token),
+         :ok <-
+           Playlists.delete_tracks(
+             spotify_user,
+             log_id,
+             snapshot_id,
+             [track_uri],
+             spotify_access_token
+           ) do
+      conn
+      |> put_flash(:info, "Playlist track deleted successfully.")
+      |> redirect(to: Routes.log_path(conn, :show, log_id))
+    end
+  end
 end

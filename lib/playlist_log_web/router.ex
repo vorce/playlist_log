@@ -18,6 +18,7 @@ defmodule PlaylistLogWeb.Router do
 
     get "/", PageController, :index
     resources "/logs", LogController
+    delete "/logs/:log_id/snapshots/:snapshot_id/tracks/:track_uri", LogController, :delete_track
     get "/spotify_callback", SpotifyCallbackController, :authenticate
   end
 

@@ -12,6 +12,11 @@
     </td>
 
     <td>
-    <span><%= link "Delete", to: "#", method: :delete, data: [confirm: "Are you sure?"] %></span>
+    <span><%=
+        link "Remove",
+            to: Routes.log_path(@conn, :delete_track, @log_id, @playlist_snapshot_id, @track.uri),
+            method: :delete,
+            data: [confirm: "Are you sure you want to remove this song from the playlist?"]
+    %></span>
     </td>
 </tr>

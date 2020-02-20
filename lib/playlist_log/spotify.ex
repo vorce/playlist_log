@@ -64,4 +64,23 @@ defmodule PlaylistLog.Spotify do
         {:error, unexpected}
     end
   end
+
+  def delete_tracks_from_playlist(access_token, playlist_id, snapshot_id, track_uris) do
+    headers = [Authorization: "Bearer #{access_token}", "Content-type": "application/json"]
+    url = @base_url <> "/playlists/#{playlist_id}/tracks"
+
+    payload =
+      %{
+        tracks: Enum.map(track_uris, fn uri -> %{uri: uri} end),
+        snapshot_id: snapshot_id
+      }
+      |> IO.inspect(label: "remove payload")
+
+    with {:ok, request_body} <- Jason.encode(payload),
+         {:ok, %HTTPoison.Response{status_code: 200, body: response_body}} <-
+           HTTPoison.request(:delete, url, request_body, headers),
+         {:ok, response} <- Jason.decode(response_body) |> IO.inspect(label: "remvove reponse") do
+      {:ok, response["snapshot_id"]}
+    end
+  end
 end

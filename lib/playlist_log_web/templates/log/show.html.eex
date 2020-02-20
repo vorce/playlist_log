@@ -14,7 +14,7 @@
   </thead>
   <tbody>
 <%= for track <- @log.tracks do
-  render "track.html", track: track    
+  render "track.html", track: track, log_id: @log.id, playlist_snapshot_id: @log.snapshot_id, conn: @conn
 end %>
   </tbody>
 </table>
