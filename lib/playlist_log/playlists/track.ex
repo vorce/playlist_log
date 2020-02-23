@@ -44,6 +44,10 @@ defmodule PlaylistLog.Playlists.Track do
   end
 
   def artist_string(%__MODULE__{} = track) do
-    track.artists |> Enum.map(fn artist -> artist["name"] end) |> Enum.join(", ")
+    artist_string(%{"artists" => track.artists})
+  end
+
+  def artist_string(%{"artists" => artists}) do
+    artists |> Enum.map(fn artist -> artist["name"] end) |> Enum.join(", ")
   end
 end

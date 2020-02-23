@@ -1,6 +1,15 @@
 <h2>LOG: <%= @log.name %></h2>
 <%= content_tag :p, @log.description %>
 
+<%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
+  <%= label f, :uri %>
+  <%= text_input f, :uri, value: "" %>
+
+  <div>
+    <%= submit "Add track to playlist", method: :post %>
+  </div>
+<% end %>
+
 <h3>Current tracks</h3>
 <table>
   <thead>
@@ -13,7 +22,7 @@
     </tr>
   </thead>
   <tbody>
-<%= for track <- @log.tracks do
+<%= for track <- @ordered_tracks do
   render "track.html", track: track, log_id: @log.id, playlist_snapshot_id: @log.snapshot_id, conn: @conn
 end %>
   </tbody>
@@ -31,13 +40,7 @@ end %>
     </tr>
   </thead>
   <tbody>
-<%= for event <- Enum.sort(@log.events, fn a, b ->
-    case DateTime.compare(a.timestamp, b.timestamp) do
-      :lt -> false
-      :gt -> true
-      _ -> true
-    end
-  end) do
+<%= for event <- @ordered_events do
   render "event.html", event: event
 end %>
   </tbody>

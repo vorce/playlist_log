@@ -1,7 +1,7 @@
 <tr>
     <td><%= content_tag :i, DateTime.to_iso8601(@event.timestamp) %></td>
     <td><%= content_tag :code, @event.type %></td>
-    <td><%= content_tag :p, "#{@event.track_artist} - #{@event.track_name}" %></td>
+    <td><%= content_tag :a, "#{@event.track_artist} - #{@event.track_name}", href: @event.track_uri %></td>
     <td><%= content_tag :p, @event.user %></td>
 
     <td>

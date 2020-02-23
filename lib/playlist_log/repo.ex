@@ -10,22 +10,24 @@ defmodule PlaylistLog.Repo do
   @early_date ~D[1985-03-13]
   @cubdb :cubdb
 
-  def get(Event = module, log_id) do
-    CubDB.select(@cubdb, select_keys(module, log_id))
-  end
-
   def get(Log = module, id) do
     with %Log{} = log <- CubDB.get(@cubdb, key(module, id), :no_such_log),
-         {:ok, events} <- get_events(log.id) do
+         {:ok, events} <- all(Event, log.id) do
       {:ok, %Log{log | events: events, event_count: length(events)}}
     else
       :no_such_log -> {:error, {:no_such_resource, id}}
     end
   end
 
-  defp get_events(log_id) do
-    with {:ok, results} <- CubDB.select(@cubdb, select_keys(Event, log_id)) do
-      {:ok, Enum.flat_map(results, fn {_key, events} -> events end)}
+  def all(Log = module, id) do
+    with {:ok, results} <- CubDB.select(@cubdb, select_keys(module, id)) do
+      {:ok, Enum.map(results, fn {_key, match} -> match end)}
+    end
+  end
+
+  def all(Event = module, id) do
+    with {:ok, results} <- CubDB.select(@cubdb, select_keys(module, id)) do
+      {:ok, Enum.flat_map(results, fn {_key, match} -> match end)}
     end
   end
 
@@ -62,6 +64,12 @@ defmodule PlaylistLog.Repo do
   def select_keys(Event, log_id) do
     min_key = key(Event, {log_id, @early_date})
     max_key = key(Event, {log_id, Date.add(Date.utc_today(), 1)})
+    [min_key: min_key, max_key: max_key]
+  end
+
+  def select_keys(Log, user_id) do
+    min_key = key(Log, {user_id, nil})
+    max_key = key(Log, {user_id, "ZZZZZZZZZZZZZZZZZZZZZZ"})
     [min_key: min_key, max_key: max_key]
   end
 

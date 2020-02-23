@@ -11,6 +11,17 @@ defmodule PlaylistLog.Playlists do
   alias PlaylistLog.Playlists.Track
   alias PlaylistLog.Spotify
 
+  # TODO: This is probably the first you have to do when coming to /logs
+  # and after adding a new playlist to spotify
+  def list_playlists(user, access_token) do
+    with {:ok, user_id} <- Map.fetch(user, "id"),
+         {:ok, playlists} <- Spotify.get_playlists(access_token),
+         logs <- Enum.map(playlists, &Log.new(&1, fetched_by: user_id)),
+         :ok <- Repo.insert(Log, user_id, logs) do
+      {:ok, logs}
+    end
+  end
+
   @doc """
   Returns the list of logs.
 
@@ -20,12 +31,9 @@ defmodule PlaylistLog.Playlists do
       [%Log{}, ...]
 
   """
-  def list_logs(user, access_token) do
-    # TODO what about old ones in db, but no longer in spotify?
+  def list_logs(user) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
-         {:ok, playlists} <- Spotify.get_playlists(access_token),
-         logs <- Enum.map(playlists, &Log.new(&1, fetched_by: user_id)),
-         :ok <- Repo.insert(Log, user_id, logs) do
+         {:ok, logs} <- Repo.all(Log, user_id) do
       {:ok, logs}
     end
   end
@@ -49,9 +57,14 @@ defmodule PlaylistLog.Playlists do
          {:ok, log} <- Repo.get(Log, {user_id, log_id}),
          {:ok, raw_tracks} <- Spotify.get_playlist_tracks(access_token, log_id),
          tracks <- Enum.map(raw_tracks, &Track.new/1),
-         :ok <- Repo.update(Log.changeset(log, %{tracks: tracks})),
-         combined_events <-
-           combine_events(log_id, tracks, log.events) do
+         combined_events <- combine_events(log_id, tracks, log.events),
+         :ok <-
+           Repo.update(
+             Log.changeset(%Log{log | events: combined_events}, %{
+               tracks: tracks,
+               event_count: length(combined_events)
+             })
+           ) do
       {:ok,
        %Log{
          log
@@ -66,8 +79,8 @@ defmodule PlaylistLog.Playlists do
   defp combine_events(log_id, tracks, events) do
     track_added_events = Enum.map(tracks, &Event.from_track(log_id, &1))
 
-    events
-    |> Enum.concat(track_added_events)
+    track_added_events
+    |> Enum.concat(events)
     |> Enum.uniq_by(fn event ->
       {event.timestamp, event.user, event.type, event.track_uri}
     end)
@@ -159,6 +172,39 @@ defmodule PlaylistLog.Playlists do
           log_id: log_id
         })
       end)
+    end
+  end
+
+  def add_tracks(user, %Log{} = log, track_uris, access_token) do
+    with {:ok, new_snapshot_id} <-
+           Spotify.add_tracks_to_playlist(access_token, log.id, track_uris),
+         {:ok, user_id} <- Map.fetch(user, "id"),
+         changeset <- Log.changeset(log, %{snapshot_id: new_snapshot_id}),
+         :ok <- Repo.update(changeset) do
+      result =
+        Enum.reduce(track_uris, %{}, fn track_uri, acc ->
+          with {:ok, raw_track} <- Spotify.get_track(track_uri, access_token) do
+            simplified_track = %{
+              artist: Track.artist_string(raw_track),
+              name: raw_track["name"],
+              uri: track_uri
+            }
+
+            create_event(log.id, %{
+              timestamp: DateTime.utc_now(),
+              type: "TRACK_ADDED",
+              user: user_id,
+              track_uri: track_uri,
+              track_name: simplified_track.name,
+              track_artist: simplified_track.artist,
+              log_id: log.id
+            })
+
+            Map.put(acc, track_uri, simplified_track)
+          end
+        end)
+
+      {:ok, result}
     end
   end
 
