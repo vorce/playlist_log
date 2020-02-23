@@ -1,8 +1,8 @@
-<h2>LOG: <%= @log.name %></h2>
+<h2><%= @log.name %></h2>
 <%= content_tag :p, @log.description %>
 
 <%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
-  <%= label f, :uri %>
+  <%= label f, :uri, "Spotify URI" %>
   <%= text_input f, :uri, value: "" %>
 
   <div>

@@ -5,7 +5,7 @@
         end %>
     </td>
     <td><%= render "album.html", album: @track.album %></td>
-    <td><%=
+    <td style="text-align: right;"><%=
         duration_string = PlaylistLogWeb.LogView.format_duration(@track.duration_ms)
         content_tag :time, duration_string
         %>
