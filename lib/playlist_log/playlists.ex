@@ -48,9 +48,7 @@ defmodule PlaylistLog.Playlists do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, log} <- Repo.get(Log, {user_id, log_id}),
          {:ok, raw_tracks} <- Spotify.get_playlist_tracks(access_token, log_id),
-         tracks <-
-           Enum.map(raw_tracks, &Track.new/1)
-           |> IO.inspect(label: "track from spotify", limit: :infinity),
+         tracks <- Enum.map(raw_tracks, &Track.new/1),
          :ok <- Repo.update(Log.changeset(log, %{tracks: tracks})),
          combined_events <-
            combine_events(log_id, tracks, log.events) do
