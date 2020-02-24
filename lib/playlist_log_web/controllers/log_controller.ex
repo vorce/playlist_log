@@ -7,6 +7,22 @@ defmodule PlaylistLogWeb.LogController do
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
 
+  def list_playlists(conn, _params) do
+    spotify_user = get_session(conn, :spotify_user)
+    spotify_access_token = conn.cookies["spotify_access_token"]
+
+    with {:ok, logs} <- Playlists.list_playlists(spotify_user, spotify_access_token) do
+      render(conn, "index.html", logs: Enum.sort(logs, fn l1, l2 -> l1.name <= l2.name end))
+    else
+      {:error, error} ->
+        error_message = get_in(error, ["error", "message"])
+
+        conn
+        |> put_flash(:error, "Error when listing playlists: #{error_message}")
+        |> redirect(to: "/")
+    end
+  end
+
   def index(conn, _params) do
     spotify_user = get_session(conn, :spotify_user)
     # spotify_access_token = conn.cookies["spotify_access_token"]
@@ -18,7 +34,7 @@ defmodule PlaylistLogWeb.LogController do
         error_message = get_in(error, ["error", "message"])
 
         conn
-        |> put_flash(:error, "Error when listing playlists: #{error_message}")
+        |> put_flash(:error, "Error when listing logs: #{error_message}")
         |> redirect(to: "/")
     end
   end
@@ -91,27 +107,27 @@ defmodule PlaylistLogWeb.LogController do
     end
   end
 
-  def update(conn, %{"id" => id, "log" => log_params}) do
-    log = Playlists.get_log!(id)
+  def update(_conn, %{"id" => _id, "log" => _log_params}) do
+    # log = Playlists.get_log!(id)
 
-    case Playlists.update_log(log, log_params) do
-      {:ok, log} ->
-        conn
-        |> put_flash(:info, "Log updated successfully.")
-        |> redirect(to: Routes.log_path(conn, :show, log))
+    # case Playlists.update_log(log, log_params) do
+    #   {:ok, log} ->
+    #     conn
+    #     |> put_flash(:info, "Log updated successfully.")
+    #     |> redirect(to: Routes.log_path(conn, :show, log))
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", log: log, changeset: changeset)
-    end
+    #   {:error, %Ecto.Changeset{} = changeset} ->
+    #     render(conn, "edit.html", log: log, changeset: changeset)
+    # end
   end
 
-  def delete(conn, %{"id" => id}) do
-    log = Playlists.get_log!(id)
-    {:ok, _log} = Playlists.delete_log(log)
+  def delete(_conn, %{"id" => _id}) do
+    # log = Playlists.get_log!(id)
+    # {:ok, _log} = Playlists.delete_log(log)
 
-    conn
-    |> put_flash(:info, "Log deleted successfully.")
-    |> redirect(to: Routes.log_path(conn, :index))
+    # conn
+    # |> put_flash(:info, "Log deleted successfully.")
+    # |> redirect(to: Routes.log_path(conn, :index))
   end
 
   def delete_track(conn, %{
@@ -146,7 +162,7 @@ defmodule PlaylistLogWeb.LogController do
            Playlists.add_tracks(spotify_user, log, [track_uri], spotify_access_token),
          {:ok, track} <- Map.fetch(tracks, track_uri) do
       conn
-      |> put_flash(:info, "Playlist track added successfully.")
+      |> put_flash(:info, "#{track.artist} - #{track.name} added successfully")
       |> redirect(to: Routes.log_path(conn, :show, log.id))
     end
   end

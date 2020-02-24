@@ -2,6 +2,7 @@ defmodule PlaylistLog.Playlists do
   @moduledoc """
   The Playlists context.
   """
+  require Logger
 
   import Ecto.Query, warn: false
   alias PlaylistLog.Repo
@@ -57,33 +58,76 @@ defmodule PlaylistLog.Playlists do
          {:ok, log} <- Repo.get(Log, {user_id, log_id}),
          {:ok, raw_tracks} <- Spotify.get_playlist_tracks(access_token, log_id),
          tracks <- Enum.map(raw_tracks, &Track.new/1),
-         combined_events <- combine_events(log_id, tracks, log.events),
+         {unique_events, missing_events} <- unique_events(log_id, tracks, log.events),
          :ok <-
            Repo.update(
-             Log.changeset(%Log{log | events: combined_events}, %{
+             Log.changeset(%Log{log | events: unique_events}, %{
                tracks: tracks,
-               event_count: length(combined_events)
+               event_count: length(unique_events)
              })
            ) do
+      Enum.each(missing_events, &create_event(log_id, &1))
+
       {:ok,
        %Log{
          log
          | tracks: tracks,
            track_count: length(tracks),
-           events: combined_events,
-           event_count: length(combined_events)
+           events: unique_events,
+           event_count: length(unique_events)
        }}
     end
   end
 
-  defp combine_events(log_id, tracks, events) do
+  defp unique_events(log_id, tracks, events) do
+    Logger.debug("Existing events: #{length(events)}")
     track_added_events = Enum.map(tracks, &Event.from_track(log_id, &1))
+    Logger.debug("Track added events: #{length(track_added_events)}")
+    missing_events = missing_events(events, track_added_events)
+    Logger.debug("Missing events: #{length(missing_events)}")
 
-    track_added_events
-    |> Enum.concat(events)
-    |> Enum.uniq_by(fn event ->
-      {event.timestamp, event.user, event.type, event.track_uri}
+    unique_events =
+      track_added_events
+      |> Enum.concat(events)
+      |> Enum.uniq_by(fn event ->
+        {DateTime.to_iso8601(event.timestamp), event.user, event.log_id, event.type,
+         event.track_uri}
+      end)
+
+    Logger.debug("Unique events: #{length(unique_events)}")
+
+    {unique_events, missing_events}
+  end
+
+  defp missing_events(events, track_added_events) do
+    events_by_date = Enum.group_by(events, fn e -> DateTime.to_date(e.timestamp) end)
+    # |> IO.inspect(label: "events_by_date")
+
+    Enum.map(track_added_events, fn track_added ->
+      event_date = DateTime.to_date(track_added.timestamp)
+
+      case Map.get(events_by_date, event_date) do
+        nil ->
+          track_added
+
+        existing when is_list(existing) ->
+          missing_event(existing, track_added)
+      end
     end)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp missing_event(existing, event) do
+    case Enum.find(existing, fn e ->
+           {DateTime.to_iso8601(e.timestamp), e.type, e.log_id, e.track_uri} ==
+             {DateTime.to_iso8601(event.timestamp), event.type, event.log_id, event.track_uri}
+         end) do
+      nil ->
+        event
+
+      _ ->
+        nil
+    end
   end
 
   @doc """
@@ -98,10 +142,10 @@ defmodule PlaylistLog.Playlists do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_log(attrs \\ %{}) do
-    %Log{}
-    |> Log.changeset(attrs)
-    |> Repo.insert()
+  def create_log(_attrs \\ %{}) do
+    # %Log{}
+    # |> Log.changeset(attrs)
+    # |> Repo.insert()
   end
 
   @doc """
@@ -134,8 +178,8 @@ defmodule PlaylistLog.Playlists do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_log(%Log{} = log) do
-    Repo.delete(log)
+  def delete_log(%Log{} = _log) do
+    # Repo.delete(log)
   end
 
   @doc """
@@ -156,7 +200,12 @@ defmodule PlaylistLog.Playlists do
            Spotify.delete_tracks_from_playlist(access_token, log_id, snapshot_id, track_uris),
          {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, log} <- Repo.get(Log, {user_id, log_id}),
-         changeset <- Log.changeset(log, %{snapshot_id: new_snapshot_id}),
+         changeset <-
+           Log.changeset(log, %{
+             snapshot_id: new_snapshot_id,
+             event_count: log.event_count + length(track_uris),
+             track_count: log.track_count - length(track_uris)
+           }),
          :ok <- Repo.update(changeset) do
       Enum.each(track_uris, fn track_uri ->
         track = Enum.find(log.tracks, fn track -> track.uri == track_uri end)
@@ -179,7 +228,12 @@ defmodule PlaylistLog.Playlists do
     with {:ok, new_snapshot_id} <-
            Spotify.add_tracks_to_playlist(access_token, log.id, track_uris),
          {:ok, user_id} <- Map.fetch(user, "id"),
-         changeset <- Log.changeset(log, %{snapshot_id: new_snapshot_id}),
+         changeset <-
+           Log.changeset(log, %{
+             snapshot_id: new_snapshot_id,
+             event_count: log.event_count + length(track_uris),
+             track_count: log.track_count + length(track_uris)
+           }),
          :ok <- Repo.update(changeset) do
       result =
         Enum.reduce(track_uris, %{}, fn track_uri, acc ->
@@ -208,7 +262,13 @@ defmodule PlaylistLog.Playlists do
     end
   end
 
-  def create_event(log_id, attrs \\ %{}) do
+  def create_event(log_id, attrs)
+
+  def create_event(log_id, %Event{} = event) do
+    Repo.insert(Event, log_id, event)
+  end
+
+  def create_event(log_id, %{} = attrs) do
     changeset = Event.changeset(%Event{}, attrs)
     Repo.insert(Event, log_id, changeset)
   end

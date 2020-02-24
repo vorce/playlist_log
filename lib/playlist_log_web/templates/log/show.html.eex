@@ -10,7 +10,7 @@
   </div>
 <% end %>
 
-<h3>Current tracks</h3>
+<h3 badge="<%= length(@ordered_tracks) %>">Current tracks</h3>
 <table>
   <thead>
     <tr>
@@ -28,7 +28,7 @@ end %>
   </tbody>
 </table>
 
-<h3>Events</h3>
+<h3 badge="<%= length(@ordered_events) %>">Events</h3>
 <table>
   <thead>
     <tr>
@@ -41,7 +41,7 @@ end %>
   </thead>
   <tbody>
 <%= for event <- @ordered_events do
-  render "event.html", event: event
+  render "event.html", event: event, conn: @conn
 end %>
   </tbody>
 </table>

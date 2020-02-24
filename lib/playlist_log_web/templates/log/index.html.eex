@@ -29,4 +29,8 @@
   </tbody>
 </table>
 
-<span><%= link "New Log", to: Routes.log_path(@conn, :new) %></span>
+<%=
+  form_for :playlists, Routes.log_path(@conn, :list_playlists), [method: :get], fn _f ->
+    submit "Reload playlists from Spotify", method: :get
+  end
+%>

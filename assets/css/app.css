@@ -1,3 +1,22 @@
 /* This file is for your main application css. */
 
 @import "./phoenix.css";
+
+[badge]:after {
+  background: rgb(12, 94, 86);
+  border-radius: 30px;
+  color: #fff;
+  content: attr(badge);
+  font-size: 14px;
+  margin-top: -10px;
+  min-width: 20px;
+  padding: 4px 10px 2px 10px;
+  position: absolute;
+  text-align: center;
+}
+
+[badge^="-"]:after,
+[badge="0"]:after,
+[badge=""]:after {
+ display: none;
+}

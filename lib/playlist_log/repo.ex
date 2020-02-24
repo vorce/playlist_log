@@ -13,6 +13,7 @@ defmodule PlaylistLog.Repo do
   def get(Log = module, id) do
     with %Log{} = log <- CubDB.get(@cubdb, key(module, id), :no_such_log),
          {:ok, events} <- all(Event, log.id) do
+      Logger.debug("Fetched events for log: #{length(events)}")
       {:ok, %Log{log | events: events, event_count: length(events)}}
     else
       :no_such_log -> {:error, {:no_such_resource, id}}
@@ -26,8 +27,13 @@ defmodule PlaylistLog.Repo do
   end
 
   def all(Event = module, id) do
-    with {:ok, results} <- CubDB.select(@cubdb, select_keys(module, id)) do
-      {:ok, Enum.flat_map(results, fn {_key, match} -> match end)}
+    with {:ok, matches} <- CubDB.select(@cubdb, select_keys(module, id)) do
+      result =
+        matches
+        |> Enum.reduce([], fn {_k, events}, acc -> [events | acc] end)
+        |> List.flatten()
+
+      {:ok, result}
     end
   end
 
@@ -38,14 +44,20 @@ defmodule PlaylistLog.Repo do
   def insert(Event = module, log_id, %Ecto.Changeset{valid?: true} = changeset) do
     event = Ecto.Changeset.apply_changes(changeset)
     key = key(module, {log_id, DateTime.to_date(event.timestamp)})
-    Logger.info("Inserting #{inspect(key: key, value: event)}")
-    CubDB.put(@cubdb, key, [event])
+    Logger.info("Adding event from changeset #{inspect(key: key, value: event)}")
+
+    CubDB.update(@cubdb, key, [event], fn existing ->
+      [event | existing]
+    end)
   end
 
   def insert(Event = module, log_id, %Event{} = event) do
     key = key(module, {log_id, DateTime.to_date(event.timestamp)})
-    Logger.info("Inserting #{inspect(key: key, value: event)}")
-    CubDB.put(@cubdb, key, [event])
+    Logger.info("Adding event #{inspect(key: key, value: event)}")
+
+    CubDB.update(@cubdb, key, [event], fn existing ->
+      [event | existing]
+    end)
   end
 
   def update(%Ecto.Changeset{valid?: true} = changeset) do
@@ -74,5 +86,5 @@ defmodule PlaylistLog.Repo do
   end
 
   def key(Log, {user_id, log_id}), do: {:log, user_id, log_id}
-  def key(Event, {log_id, date}), do: {:event, log_id, date}
+  def key(Event, {log_id, date}), do: {:event, log_id, Date.to_iso8601(date, :basic)}
 end
