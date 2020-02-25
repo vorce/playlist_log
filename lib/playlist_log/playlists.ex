@@ -13,14 +13,25 @@ defmodule PlaylistLog.Playlists do
   alias PlaylistLog.Spotify
 
   # TODO: This is probably the first you have to do when coming to /logs
-  # and after adding a new playlist to spotify
+  # and after adding a new playlist to spotify or changing its properties (like name, description)
   def list_playlists(user, access_token) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, playlists} <- Spotify.get_playlists(access_token),
          logs <- Enum.map(playlists, &Log.new(&1, fetched_by: user_id)),
-         :ok <- Repo.insert(Log, user_id, logs) do
+         :ok <- Repo.update(Log, user_id, logs, &merge_spotify_data/2) do
       {:ok, logs}
     end
+  end
+
+  defp merge_spotify_data(%Log{} = existing, %Log{} = new) do
+    %Log{
+      existing
+      | track_count: new.track_count,
+        description: new.description,
+        name: new.name,
+        snapshot_id: new.snapshot_id,
+        collaborative: new.collaborative
+    }
   end
 
   @doc """

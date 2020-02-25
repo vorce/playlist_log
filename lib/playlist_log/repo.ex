@@ -37,6 +37,13 @@ defmodule PlaylistLog.Repo do
     end
   end
 
+  def update(Log = module, user_id, logs, update_fn) when is_list(logs) do
+    Enum.each(logs, fn log ->
+      key = key(module, {user_id, log.id})
+      CubDB.update(@cubdb, key, log, fn existing -> update_fn.(existing, log) end)
+    end)
+  end
+
   def insert(Log = module, user_id, logs) do
     Enum.each(logs, fn log -> CubDB.put(@cubdb, key(module, {user_id, log.id}), log) end)
   end
