@@ -17,7 +17,7 @@ defmodule PlaylistLogWeb.SpotifyCallbackController do
     end
   end
 
-  def logout(conn, params) do
+  def logout(_conn, _params) do
     # TODO
   end
 end

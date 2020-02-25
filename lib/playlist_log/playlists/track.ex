@@ -12,6 +12,7 @@ defmodule PlaylistLog.Playlists.Track do
     field(:uri, :string)
     field(:added_at, :utc_datetime)
     field(:added_by, :string)
+    field(:log_id, :string)
   end
 
   @doc false
@@ -21,7 +22,7 @@ defmodule PlaylistLog.Playlists.Track do
 
   def changeset(track, %{} = attrs) do
     track
-    |> cast(attrs, [:name, :artists, :album, :duration_ms, :uri, :added_at, :added_by])
+    |> cast(attrs, [:name, :artists, :album, :duration_ms, :uri, :added_at, :added_by, :log_id])
     |> validate_required([:name])
   end
 
