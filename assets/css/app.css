@@ -2,6 +2,10 @@
 
 @import "./phoenix.css";
 
+.container {
+    max-width: 100%;
+}
+
 [badge]:after {
   background: rgb(12, 94, 86);
   border-radius: 30px;
@@ -19,4 +23,61 @@
 [badge="0"]:after,
 [badge=""]:after {
  display: none;
+}
+
+.event-icon {
+  float: left;
+  margin-right: 0.5rem;
+  margin-top: .15em;
+}
+
+.event-icon-red {
+  filter: brightness(0.8) sepia(65%) hue-rotate(1deg) saturate(50);
+}
+
+.event-icon-green {
+  filter: brightness(0.8) sepia(65%) hue-rotate(50deg) saturate(50);
+}
+
+.add-track {
+  font-weight: 700;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.timeline-item {
+  padding: 3em 2em 2em;
+  position: relative;
+  color: rgba(0, 0, 0, .7);
+  border-left: 2px solid rgba(0, 0, 0, .3);
+}
+
+.timeline-item p {
+  font-size: 1rem;
+}
+
+.timeline-item::before {
+  content: attr(date-is);
+  position: absolute;
+  left: 1em;
+  top: 0.75em;
+  display: block;
+  font-size: 1.5rem;
+}
+
+.timeline-item::after {
+  width: 12px;
+  height: 12px;
+  display: block;
+  top: 1em;
+  position: absolute;
+  left: -7px;
+  border-radius: 10px;
+  content: '';
+  border: 2px solid rgba(0, 0, 0, .3);
+  background: white;
+}
+
+.timeline-item:last-child {
+  border-image: linear-gradient(to bottom, rgba(0, 0, 0, .3) 60%, rgba(0, 0, 0, 0)) 1 100%;
 }

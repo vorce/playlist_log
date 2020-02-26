@@ -1,50 +1,47 @@
-<h2><%= @log.name %></h2>
-<%= content_tag :p, @log.description %>
-
-<%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
-  <%= label f, :uri, "Spotify URI" %>
-  <%= text_input f, :uri, value: "" %>
-
-  <div>
-    <%= submit "Add track to playlist", method: :post %>
+<div class="row">
+  <div class="column column-100">
+    <h2><%= @log.name %></h2>
+    <%= content_tag :blockquote, @log.description %>
   </div>
-<% end %>
+</div>
 
-<h3 badge="<%= length(@ordered_tracks) %>">Current tracks</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Artist</th>
-      <th>Album</th>
-      <th>🕒</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for track <- @ordered_tracks do
-  render "track.html", track: track, log_id: @log.id, playlist_snapshot_id: @log.snapshot_id, conn: @conn
-end %>
-  </tbody>
-</table>
+<div class="row">
+  <div class="column column-50">
+    <h3 badge="<%= length(@ordered_tracks) %>">Current tracks</h3>
 
-<h3 badge="<%= length(@ordered_events) %>">Events</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Timestamp</th>
-      <th>Type</th>
-      <th>Track</th>
-      <th>User</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for event <- @ordered_events do
-  render "event.html", event: event, conn: @conn
-end %>
-  </tbody>
-</table>
+    <%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
+      <%= label f, :uri, "Spotify URI" %>
+      <div class="row">
+          <div class="column column-60"><%= text_input f, :uri, value: "" %></div>
+          <div class="column"><%= submit "Add", method: :post %></div>
+      </div>
+    <% end %>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Artist</th>
+          <th>Album</th>
+          <th>🕒</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+    <%= for track <- @ordered_tracks do
+      render "track.html", track: track, log_id: @log.id, playlist_snapshot_id: @log.snapshot_id, conn: @conn
+    end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="column column-50">
+    <h3 badge="<%= length(@log.events) %>">Events</h3>
+    <%= for {date, events} <- @ordered_events do
+      render "date_events.html", date: date, events: events, conn: @conn
+    end %>
+  </div>
+</div>
 
 <span><%= link "Edit", to: Routes.log_path(@conn, :edit, @log) %></span>
 <span><%= link "Back", to: Routes.log_path(@conn, :index) %></span>
