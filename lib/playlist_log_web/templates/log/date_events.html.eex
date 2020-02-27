@@ -1,5 +1,11 @@
 <div class="timeline-item" date-is="<%= Date.to_iso8601(@date) %>">
-<%= for event <- @events do
+<%= for event <- Enum.sort(@events, fn e1, e2 ->
+    case DateTime.compare(e1.timestamp, e2.timestamp) do
+      :lt -> false
+      :gt -> true
+      _ -> true
+    end
+  end) do
     {icon, description, class} = if event.type == "TRACK_ADDED" do
       {
         "/images/icon_add.svg",
