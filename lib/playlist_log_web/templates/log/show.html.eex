@@ -23,7 +23,7 @@
           <th>Title</th>
           <th>Artist</th>
           <th>Album</th>
-          <th>🕒</th>
+          <th><img src="/images/icon_time.svg" title="Track duration" widht="18" height="18" class="track-duration-icon"></th>
           <th></th>
         </tr>
       </thead>
