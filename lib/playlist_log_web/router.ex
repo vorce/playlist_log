@@ -16,7 +16,7 @@ defmodule PlaylistLogWeb.Router do
   scope "/", PlaylistLogWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", LogController, :index
     resources "/logs", LogController
     delete "/logs/:log_id/snapshots/:snapshot_id/tracks/:track_uri", LogController, :delete_track
     post "/logs/:log_id/tracks", LogController, :add_track

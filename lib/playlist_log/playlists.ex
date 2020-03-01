@@ -112,7 +112,6 @@ defmodule PlaylistLog.Playlists do
 
   defp missing_events(events, track_added_events) do
     events_by_date = Enum.group_by(events, fn e -> DateTime.to_date(e.timestamp) end)
-    # |> IO.inspect(label: "events_by_date")
 
     Enum.map(track_added_events, fn track_added ->
       event_date = DateTime.to_date(track_added.timestamp)

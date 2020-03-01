@@ -36,7 +36,7 @@
   </div>
 
   <div class="column column-50">
-    <h3 badge="<%= length(@log.events) %>">Events</h3>
+    <h3 badge="<%= length(@log.events) %>">Changes</h3>
     <%= for {date, events} <- @ordered_events do
       render "date_events.html", date: date, events: events, conn: @conn
     end %>

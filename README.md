@@ -18,8 +18,8 @@ https://hexdocs.pm/cubdb/howto.html
 
 ```elixir
 %{
-  {:log, user_id, log_id} => %Log{}
-  {:event, log_id, Date} => [%Event{}, %Event{}]
+  {:log, <user-id>, <log-id>} => %Log{}
+  {:event, <log-id>, <date-string>} => [%Event{}, %Event{}]
 }
 ```
 

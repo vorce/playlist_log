@@ -1,4 +1,4 @@
-<h1>Listing Logs</h1>
+<h1>Playlists</h1>
 
 <table>
   <thead>
@@ -7,23 +7,15 @@
       <th>Description</th>
       <th>Tracks</th>
       <th>Events</th>
-
-      <th></th>
     </tr>
   </thead>
   <tbody>
 <%= for log <- @logs do %>
     <tr>
-      <td><%= content_tag :p, log.name %></td>
+      <td><%= link(log.name, to: Routes.log_path(@conn, :show, log)) %></td>
       <td><%= content_tag :p, log.description %></td>
       <td><%= log.track_count %></td>
       <td><%= log.event_count %></td>
-
-      <td>
-        <span><%= link "Show", to: Routes.log_path(@conn, :show, log) %></span>
-        <span><%= link "Edit", to: Routes.log_path(@conn, :edit, log) %></span>
-        <span><%= link "Delete", to: Routes.log_path(@conn, :delete, log), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
     </tr>
 <% end %>
   </tbody>
@@ -31,6 +23,6 @@
 
 <%=
   form_for :playlists, Routes.log_path(@conn, :list_playlists), [method: :get], fn _f ->
-    submit "Reload playlists from Spotify", method: :get
+    submit img_tag("/images/icon_rotate.svg", class: "event-icon event-icon-white", title: "Reload playlists from Spotify"), method: :get
   end
 %>
