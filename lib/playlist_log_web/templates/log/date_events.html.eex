@@ -6,7 +6,7 @@
       _ -> true
     end
   end) do
-    time_string = event.timestamp |> DateTime.to_time() |> Time.to_iso8601()
+    time_string = Time.to_iso8601(event.timestamp)
     {icon, description, class} = if event.type == "TRACK_ADDED" do
       {
         "/images/icon_add.svg",
@@ -20,10 +20,11 @@
         "icon-red"
       }
     end
+    icon_title = description |> String.split() |> Enum.take(2) |> Enum.join(" ")
 
     content_tag :div, class: "card" do [
       content_tag :div, class: "card-header" do [
-        img_tag(icon, class: "card-header-icon event-icon #{class}", title: description |> String.split() |> Enum.take(2) |> Enum.join(" ")),
+        img_tag(icon, class: "card-header-icon event-icon #{class}", title: icon_title),
         content_tag :h5 do [
                 content_tag(:a, "#{event.track_artist} - #{event.track_name} ", href: event.track_uri),
             ] end
