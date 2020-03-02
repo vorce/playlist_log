@@ -13,7 +13,7 @@
       <%= label f, :uri, "Spotify URI" %>
       <div class="row">
           <div class="column column-60"><%= text_input f, :uri, value: "" %></div>
-          <div class="column"><%= submit img_tag("/images/icon_add.svg", class: "event-icon event-icon-white", title: "Add track to playlist"), method: :post %></div>
+          <div class="column"><%= submit "Add track", method: :post %></div>
       </div>
     <% end %>
 

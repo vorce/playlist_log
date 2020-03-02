@@ -34,6 +34,13 @@
  display: none;
 }
 
+.button-small {
+  font-size: .8rem;
+  height: 2.8rem;
+  line-height: 2.8rem;
+  padding: 0 1.5rem;
+}
+
 .track-listing td {
   padding-left: 10px;
   padding-right: 10px;
@@ -44,24 +51,24 @@
 }
 
 .event-icon {
-  float: left;
   margin-right: 0.5rem;
-  margin-top: .15em;
+  margin-top: -2rem;
 }
 
 .track-duration-icon {
   margin-top: 4px;
+  vertical-align: middle;
 }
 
-.event-icon-red {
+.icon-red {
   filter: brightness(0.8) sepia(65%) hue-rotate(1deg) saturate(50);
 }
 
-.event-icon-white {
+.icon-white {
   filter: invert(100%) brightness(150%);
 }
 
-.event-icon-green {
+.icon-green {
   filter: brightness(0.8) sepia(65%) hue-rotate(50deg) saturate(50);
 }
 
@@ -79,7 +86,7 @@
 }
 
 .timeline-item p {
-  font-size: 1rem;
+  font-size: 1.5rem;
 }
 
 .timeline-item::before {
@@ -106,4 +113,31 @@
 
 .timeline-item:last-child {
   border-image: linear-gradient(to bottom, rgba(0, 0, 0, .3) 60%, rgba(0, 0, 0, 0)) 1 100%;
+}
+
+.card {
+  width: 500px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  margin-bottom: 15px;
+}
+
+.card-header {
+  font-weight: 600;
+  padding: 15px 15px;
+  padding-bottom: 0;
+  display: flex;
+}
+
+.card-content {
+  padding: 5px 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.align-right {
+  margin-left: auto;
 }
