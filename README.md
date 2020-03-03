@@ -10,6 +10,10 @@ A log / timeline of song additions and removals for a Spotify playlist.
 - Overview of current songs in playlist + changes for the playlist (changes are either track additions or removals)
 - In the playlist overview you can add and delete tracks to/from the playlist, doing this will create new changes/events.
 
+## TODO
+
+- Ensure all listed playlists are editable by the current user
+- Enable users to filter changes/events by type
 
 ## Storage details
 
