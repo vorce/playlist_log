@@ -5,9 +5,10 @@ A log / timeline of song additions and removals for a Spotify playlist.
 ## Workflow
 
 - Sign in to spotify
-- Select playlist
-- Show current songs in playlist + show events for the playlist (events are either additions or removals of tracks to the playlist)
-- Present options to delete and add songs to the playlist, doing this will create new events in the log for that playlist.
+- Load playlists from Spotify (only needed the first time or if you make updates to playlists like name, description)
+- Choose playlist
+- Overview of current songs in playlist + changes for the playlist (changes are either track additions or removals)
+- In the playlist overview you can add and delete tracks to/from the playlist, doing this will create new changes/events.
 
 
 ## Storage details

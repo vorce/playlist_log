@@ -85,7 +85,6 @@ defmodule PlaylistLog.Spotify do
   Delete tracks from a playlist.
 
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/remove-tracks-playlist/
-  - issue regarding `snapshot_id` parameter (use `snapshot` instead): https://github.com/spotify/web-api/issues/1482
   """
   def delete_tracks_from_playlist(access_token, playlist_id, snapshot_id, track_uris) do
     headers = [Authorization: "Bearer #{access_token}", "Content-type": "application/json"]
@@ -93,7 +92,7 @@ defmodule PlaylistLog.Spotify do
 
     payload = %{
       tracks: Enum.map(track_uris, fn uri -> %{uri: uri} end),
-      snapshot: snapshot_id
+      snapshot_id: snapshot_id
     }
 
     with {:ok, request_body} <- Jason.encode(payload),
