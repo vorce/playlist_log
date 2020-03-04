@@ -12,7 +12,6 @@ defmodule PlaylistLog.Spotify do
   Get all user's playlists. Note: This will page through spotify's API to get ALL lists.
 
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/get-a-list-of-current-users-playlists/
-  TODO: Pagination (return more than the first X playlists?)
   """
   def get_playlists(access_token) do
     url = @base_url <> "/me/playlists?limit=50"

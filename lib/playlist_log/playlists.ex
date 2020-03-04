@@ -17,9 +17,11 @@ defmodule PlaylistLog.Playlists do
   def list_playlists(user, access_token) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, playlists} <- Spotify.get_playlists(access_token),
-         logs <- Enum.map(playlists, &Log.new(&1, fetched_by: user_id)),
+         owned_playlists <-
+           Enum.filter(playlists, fn playlist -> get_in(playlist, ["owner", "id"]) == user_id end),
+         logs <- Enum.map(owned_playlists, &Log.new(&1, fetched_by: user_id)),
          :ok <- Repo.update(Log, user_id, logs, &merge_spotify_data/2) do
-      {:ok, logs}
+      {:ok, Enum.sort(logs, &alphabetically/2)}
     end
   end
 
@@ -46,8 +48,12 @@ defmodule PlaylistLog.Playlists do
   def list_logs(user) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, logs} <- Repo.all(Log, user_id) do
-      {:ok, logs}
+      {:ok, Enum.sort(logs, &alphabetically/2)}
     end
+  end
+
+  defp alphabetically(log1, log2) do
+    log1.name <= log2.name
   end
 
   @doc """

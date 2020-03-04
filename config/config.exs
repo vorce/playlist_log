@@ -28,7 +28,12 @@ config :spotify_ex,
   callback_url:
     System.get_env("SPOTIFY_REDIRECT_URI") || "http://localhost:4000/spotify_callback",
   user_id: "unknown",
-  scopes: ["playlist-modify-public", "playlist-modify-private"]
+  scopes: [
+    "playlist-modify-public",
+    "playlist-modify-private",
+    "playlist-read-private",
+    "playlist-read-collaborative"
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
