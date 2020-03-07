@@ -31,12 +31,8 @@ defmodule PlaylistLog.Spotify do
          {:ok, playlists} <- Map.fetch(response, "items") do
       get_next_page(response["next"], access_token, [playlists | acc])
     else
-      {:ok, %HTTPoison.Response{status_code: 400..499, body: body}} ->
-        {:error, Jason.decode!(body)}
-
-      {_, unexpected} ->
-        Logger.error("Unexpected response from #{url}: #{inspect(unexpected)}")
-        {:error, unexpected}
+      other ->
+        handle_unexpected_response(url, other)
     end
   end
 
@@ -51,9 +47,8 @@ defmodule PlaylistLog.Spotify do
          {:ok, response} <- Jason.decode(body) do
       {:ok, response}
     else
-      {_, unexpected} ->
-        Logger.error("Unexpected response from #{url}: #{inspect(unexpected)}")
-        {:error, unexpected}
+      other ->
+        handle_unexpected_response(url, other)
     end
   end
 
@@ -71,12 +66,8 @@ defmodule PlaylistLog.Spotify do
          {:ok, tracks} <- Map.fetch(response, "items") do
       {:ok, tracks}
     else
-      {:ok, %HTTPoison.Response{status_code: 400..499, body: body}} ->
-        {:error, Jason.decode!(body)}
-
-      {_, unexpected} ->
-        Logger.error("Unexpected response from #{url}: #{inspect(unexpected)}")
-        {:error, unexpected}
+      other ->
+        handle_unexpected_response(url, other)
     end
   end
 
@@ -99,6 +90,9 @@ defmodule PlaylistLog.Spotify do
            HTTPoison.request(:delete, url, request_body, headers),
          {:ok, response} <- Jason.decode(response_body) do
       {:ok, response["snapshot_id"]}
+    else
+      other ->
+        handle_unexpected_response(url, other)
     end
   end
 
@@ -121,11 +115,8 @@ defmodule PlaylistLog.Spotify do
          {:ok, response} <- Jason.decode(response_body) do
       {:ok, response["snapshot_id"]}
     else
-      {:ok, %HTTPoison.Response{} = resp} ->
-        {:error, resp}
-
       other ->
-        other
+        handle_unexpected_response(url, other)
     end
   end
 
@@ -141,6 +132,32 @@ defmodule PlaylistLog.Spotify do
            HTTPoison.get(url, headers),
          {:ok, response} <- Jason.decode(response_body) do
       {:ok, response}
+    else
+      other ->
+        handle_unexpected_response(url, other)
     end
+  end
+
+  defp handle_unexpected_response(url, {:ok, %HTTPoison.Response{status_code: 429, body: body}}) do
+    Logger.info("Hit spotify rate-limit (429) for #{url}")
+    {:error, Jason.decode!(body)}
+  end
+
+  defp handle_unexpected_response(
+         url,
+         {:ok, %HTTPoison.Response{status_code: 400..499, body: body} = resp}
+       ) do
+    Logger.info("Client error from spotify #{url}: #{inspect(resp)}")
+    {:error, Jason.decode!(body)}
+  end
+
+  defp handle_unexpected_response(url, {:ok, %HTTPoison.Response{} = resp}) do
+    Logger.error("Unexpected response from spotify #{url}: #{inspect(resp)}")
+    {:error, resp}
+  end
+
+  defp handle_unexpected_response(url, response) do
+    Logger.error("Unexpected response from spotify #{url}: #{inspect(response)}")
+    response
   end
 end
