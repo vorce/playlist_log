@@ -39,7 +39,7 @@ defmodule PlaylistLog.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:cubdb, "~> 0.16"},
+      {:cubdb, "~> 0.17"},
       {:ecto, "~> 3.3"},
       {:phoenix_ecto, "~> 4.0"},
       {:spotify_ex, "~> 2.0"},

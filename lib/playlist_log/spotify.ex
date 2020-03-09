@@ -2,6 +2,7 @@ defmodule PlaylistLog.Spotify do
   @moduledoc """
   Spotify details
   """
+  @behaviour PlaylistLog.MusicClient
   require Logger
 
   # https://developer.spotify.com/documentation/general/guides/scopes/
@@ -13,6 +14,7 @@ defmodule PlaylistLog.Spotify do
 
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/get-a-list-of-current-users-playlists/
   """
+  @impl PlaylistLog.MusicClient
   def get_playlists(access_token) do
     url = @base_url <> "/me/playlists?limit=50"
     get_next_page(url, access_token, [])

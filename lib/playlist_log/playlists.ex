@@ -10,13 +10,15 @@ defmodule PlaylistLog.Playlists do
   alias PlaylistLog.Playlists.Event
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
-  alias PlaylistLog.Spotify
+
+  # Spotify client from config
+  defp spotify(), do: Application.get_env(:playlist_log, PlaylistLog.Playlists)[:spotify_client]
 
   # TODO: This is probably the first you have to do when coming to /logs
   # and after adding a new playlist to spotify or changing its properties (like name, description)
   def list_playlists(user, access_token) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
-         {:ok, playlists} <- Spotify.get_playlists(access_token),
+         {:ok, playlists} <- spotify().get_playlists(access_token),
          owned_playlists <-
            Enum.filter(playlists, fn playlist -> get_in(playlist, ["owner", "id"]) == user_id end),
          logs <- Enum.map(owned_playlists, &Log.new(&1, fetched_by: user_id)),
@@ -73,7 +75,7 @@ defmodule PlaylistLog.Playlists do
   def get_log(user, log_id, access_token) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, log} <- Repo.get(Log, {user_id, log_id}),
-         {:ok, raw_tracks} <- Spotify.get_playlist_tracks(access_token, log_id),
+         {:ok, raw_tracks} <- spotify().get_playlist_tracks(access_token, log_id),
          tracks <- Enum.map(raw_tracks, &Track.new/1),
          {unique_events, missing_events} <- unique_events(log_id, tracks, log.events),
          :ok <-
@@ -97,11 +99,8 @@ defmodule PlaylistLog.Playlists do
   end
 
   defp unique_events(log_id, tracks, events) do
-    Logger.debug("Existing events: #{length(events)}")
     track_added_events = Enum.map(tracks, &Event.from_track(log_id, &1))
-    Logger.debug("Track added events: #{length(track_added_events)}")
     missing_events = missing_events(events, track_added_events)
-    Logger.debug("Missing events: #{length(missing_events)}")
 
     unique_events =
       track_added_events
@@ -111,7 +110,14 @@ defmodule PlaylistLog.Playlists do
          event.track_uri}
       end)
 
-    Logger.debug("Unique events: #{length(unique_events)}")
+    details = [
+      existing_events: length(events),
+      track_added_events: length(track_added_events),
+      missing_events: length(missing_events),
+      unique_events: length(unique_events)
+    ]
+
+    Logger.debug("Event details: #{inspect(details)}")
 
     {unique_events, missing_events}
   end
@@ -213,7 +219,7 @@ defmodule PlaylistLog.Playlists do
 
   def delete_tracks(user, log_id, snapshot_id, track_uris, access_token) do
     with {:ok, new_snapshot_id} <-
-           Spotify.delete_tracks_from_playlist(access_token, log_id, snapshot_id, track_uris),
+           spotify().delete_tracks_from_playlist(access_token, log_id, snapshot_id, track_uris),
          {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, log} <- Repo.get(Log, {user_id, log_id}),
          changeset <-
@@ -242,7 +248,7 @@ defmodule PlaylistLog.Playlists do
 
   def add_tracks(user, %Log{} = log, track_uris, access_token) do
     with {:ok, new_snapshot_id} <-
-           Spotify.add_tracks_to_playlist(access_token, log.id, track_uris),
+           spotify().add_tracks_to_playlist(access_token, log.id, track_uris),
          {:ok, user_id} <- Map.fetch(user, "id"),
          changeset <-
            Log.changeset(log, %{
@@ -253,7 +259,7 @@ defmodule PlaylistLog.Playlists do
          :ok <- Repo.update(changeset) do
       result =
         Enum.reduce(track_uris, %{}, fn track_uri, acc ->
-          with {:ok, raw_track} <- Spotify.get_track(track_uri, access_token) do
+          with {:ok, raw_track} <- spotify().get_track(track_uri, access_token) do
             simplified_track = %{
               artist: Track.artist_string(raw_track),
               name: raw_track["name"],

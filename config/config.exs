@@ -5,7 +5,7 @@
 # is restricted to this project.
 
 # General application configuration
-use Mix.Config
+import Config
 
 # Configures the endpoint
 config :playlist_log, PlaylistLogWeb.Endpoint,
@@ -13,6 +13,11 @@ config :playlist_log, PlaylistLogWeb.Endpoint,
   secret_key_base: "pzeDB0c+6lv7SPX+nT1orYlOSTMHKnjgaPRSf7TQ8Rs3pMtVCKUmi1o+LMLl/exB",
   render_errors: [view: PlaylistLogWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: PlaylistLog.PubSub, adapter: Phoenix.PubSub.PG2]
+
+# Path.join(:code.priv_dir(:playlist_log), "cubdb")
+config :playlist_log, PlaylistLog.Repo, data_dir: "priv/cubdb"
+
+config :playlist_log, PlaylistLog.Playlists, spotify_client: PlaylistLog.Spotify
 
 # Configures Elixir's Logger
 config :logger, :console,

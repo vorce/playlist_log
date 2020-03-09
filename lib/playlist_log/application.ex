@@ -5,7 +5,7 @@ defmodule PlaylistLog.Application do
 
   use Application
 
-  @cubdb_data_dir Path.join(:code.priv_dir(:playlist_log), "cubdb")
+  @cubdb_data_dir Application.get_env(:playlist_log, PlaylistLog.Repo)[:data_dir]
 
   def start(_type, _args) do
     # List all child processes to be supervised
