@@ -62,6 +62,10 @@ defmodule PlaylistLog.Test.SpotifyStubClient do
     }
   ]
   """
+  def get_playlists("fail") do
+    {:error, {__MODULE__, %{}}}
+  end
+
   def get_playlists(_access_token) do
     {:ok, Jason.decode!(@get_playlists_response)}
   end

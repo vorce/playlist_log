@@ -142,7 +142,7 @@ defmodule PlaylistLog.Spotify do
 
   defp handle_unexpected_response(url, {:ok, %HTTPoison.Response{status_code: 429, body: body}}) do
     Logger.info("Hit spotify rate-limit (429) for #{url}")
-    {:error, Jason.decode!(body)}
+    {:error, {__MODULE__, Jason.decode!(body)}}
   end
 
   defp handle_unexpected_response(
@@ -150,16 +150,16 @@ defmodule PlaylistLog.Spotify do
          {:ok, %HTTPoison.Response{status_code: 400..499, body: body} = resp}
        ) do
     Logger.info("Client error from spotify #{url}: #{inspect(resp)}")
-    {:error, Jason.decode!(body)}
+    {:error, {__MODULE__, Jason.decode!(body)}}
   end
 
   defp handle_unexpected_response(url, {:ok, %HTTPoison.Response{} = resp}) do
     Logger.error("Unexpected response from spotify #{url}: #{inspect(resp)}")
-    {:error, resp}
+    {:error, {__MODULE__, resp}}
   end
 
   defp handle_unexpected_response(url, response) do
     Logger.error("Unexpected response from spotify #{url}: #{inspect(response)}")
-    response
+    {:error, {__MODULE__, response}}
   end
 end
