@@ -2,6 +2,10 @@
 
 @import "./phoenix.css";
 
+/* liveview css
+@import "../../deps/phoenix_live_view/assets/css/live_view.css";
+*/
+
 .container {
     max-width: 100%;
 }

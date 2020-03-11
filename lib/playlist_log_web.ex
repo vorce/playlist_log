@@ -24,6 +24,8 @@ defmodule PlaylistLogWeb do
       import Plug.Conn
       import PlaylistLogWeb.Gettext
       alias PlaylistLogWeb.Router.Helpers, as: Routes
+
+      import Phoenix.LiveView.Controller
     end
   end
 
@@ -42,6 +44,8 @@ defmodule PlaylistLogWeb do
       import PlaylistLogWeb.ErrorHelpers
       import PlaylistLogWeb.Gettext
       alias PlaylistLogWeb.Router.Helpers, as: Routes
+
+      import Phoenix.LiveView.Helpers
     end
   end
 
@@ -50,6 +54,8 @@ defmodule PlaylistLogWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+
+      import Phoenix.LiveView.Router
     end
   end
 

@@ -32,7 +32,7 @@ defmodule PlaylistLog.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.10"},
+      {:phoenix, "~> 1.4"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -43,7 +43,9 @@ defmodule PlaylistLog.MixProject do
       {:ecto, "~> 3.3"},
       {:phoenix_ecto, "~> 4.0"},
       {:spotify_ex, "~> 2.0"},
-      {:httpoison, "~> 1.0"}
+      {:httpoison, "~> 1.0"},
+      {:phoenix_live_view, "~> 0.9"},
+      {:floki, ">= 0.0.0", only: :test}
     ]
   end
 end

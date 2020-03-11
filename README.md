@@ -2,6 +2,10 @@
 
 A log / timeline of song additions and removals for a Spotify playlist.
 
+I use this to keep a sliding window of around 50 tracks that I dig at the moment.
+By using PlaylistLog I get a nice historic timelime of previous tracks that was part
+of the playlist at some point.
+
 ## Workflow
 
 - Sign in to spotify
@@ -12,7 +16,6 @@ A log / timeline of song additions and removals for a Spotify playlist.
 
 ## TODO
 
-- Ensure all listed playlists are editable by the current user
 - Enable users to filter changes/events by type
 
 ## Storage details
