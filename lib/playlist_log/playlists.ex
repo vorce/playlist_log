@@ -266,16 +266,6 @@ defmodule PlaylistLog.Playlists do
               uri: track_uri
             }
 
-            create_event(log.id, %{
-              timestamp: DateTime.utc_now(),
-              type: "TRACK_ADDED",
-              user: user_id,
-              track_uri: track_uri,
-              track_name: simplified_track.name,
-              track_artist: simplified_track.artist,
-              log_id: log.id
-            })
-
             Map.put(acc, track_uri, simplified_track)
           end
         end)

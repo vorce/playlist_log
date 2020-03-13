@@ -54,8 +54,8 @@
 }
 
 .remove-icon {
-  height: 48px;
-  width: 48px;
+  height: 24px;
+  width: 24px;
 }
 
 .event-icon {
@@ -148,4 +148,20 @@
 
 .align-right {
   margin-left: auto;
+}
+
+
+/* Toggles for filtering events */
+.switch-toggle {
+  width: 40%;
+}
+
+.switch-material.switch-light input:checked ~ span a {
+  background: #0069d9 !important;
+}
+.switch-toggle.switch-material a {
+  background: #0069d9 !important;
+}
+.switch-light.switch-material > span:before, .switch-light.switch-material > span:after, .switch-toggle.switch-material label:after {
+  background: #0069d9 !important;
 }

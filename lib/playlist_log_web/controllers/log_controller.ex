@@ -2,6 +2,7 @@ defmodule PlaylistLogWeb.LogController do
   use PlaylistLogWeb, :controller
   plug PlaylistLogWeb.Plugs.SpotifyAuth
 
+  alias Phoenix.LiveView.Controller
   alias PlaylistLog.Playlists
   alias PlaylistLog.Playlists.Event
   alias PlaylistLog.Playlists.Log
@@ -62,7 +63,7 @@ defmodule PlaylistLogWeb.LogController do
 
     with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token),
          ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2),
-         ordered_events <- order_by_date(log.events) do
+         ordered_events <- Event.order_by_date(log.events) do
       render(conn, "show.html",
         log: log,
         ordered_tracks: ordered_tracks,
@@ -80,30 +81,12 @@ defmodule PlaylistLogWeb.LogController do
     latest_first_order(t1.added_at, t2.added_at)
   end
 
-  defp latest_first_order(%Event{} = e1, %Event{} = e2) do
-    latest_first_order(e1.timestamp, e2.timestamp)
-  end
-
-  defp latest_first_order({date1, _}, {date2, _}) do
-    case Date.compare(date1, date2) do
-      :lt -> false
-      :gt -> true
-      _ -> true
-    end
-  end
-
   defp latest_first_order(%DateTime{} = d1, %DateTime{} = d2) do
     case DateTime.compare(d1, d2) do
       :lt -> false
       :gt -> true
       _ -> true
     end
-  end
-
-  defp order_by_date(events) do
-    events
-    |> Enum.group_by(fn event -> DateTime.to_date(event.timestamp) end)
-    |> Enum.sort(&latest_first_order/2)
   end
 
   def edit(conn, %{"id" => id}) do

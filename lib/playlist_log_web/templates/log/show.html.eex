@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/css-toggle-switch/latest/toggle-switch.css" />
+
 <div class="row">
   <div class="column column-100">
     <h2><%= @log.name %></h2>
@@ -36,10 +38,7 @@
   </div>
 
   <div class="column column-50">
-    <h3 badge="<%= length(@log.events) %>">Changes</h3>
-    <%= for {date, events} <- @ordered_events do
-      render "date_events.html", date: date, events: events, conn: @conn
-    end %>
+    <%= live_render(@conn, PlaylistLogWeb.LogLiveView, session: %{"show_events" => "all", "events" => @log.events, "ordered_events" => @ordered_events}) %>
   </div>
 </div>
 

@@ -45,4 +45,18 @@ defmodule PlaylistLog.Playlists.Event do
       log_id: log_id
     }
   end
+
+  def order_by_date(events) do
+    events
+    |> Enum.group_by(fn event -> DateTime.to_date(event.timestamp) end)
+    |> Enum.sort(&latest_first_order/2)
+  end
+
+  defp latest_first_order({date1, _}, {date2, _}) do
+    case Date.compare(date1, date2) do
+      :lt -> false
+      :gt -> true
+      _ -> true
+    end
+  end
 end
