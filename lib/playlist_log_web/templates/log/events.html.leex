@@ -3,68 +3,22 @@
 <form phx-change="event_filter_change">
 <fieldset>
     <legend>Show</legend>
-    <%# <div class="switch-toggle switch-material"> %>
     <div style="display: flex;">
-    <input id="all" name="show_events" value="all" type="radio" <%= if @show_events == "all", do: "checked" %>>
-    <label for="all">All</label>
+        <input id="all" name="show_events" value="all" type="radio" <%= if @show_events == "all", do: "checked" %>>
+        <label for="all">All</label>
 
-    <input id="additions" name="show_events" value="additions" type="radio" <%= if @show_events == "additions", do: "checked" %>>
-    <label for="additions">Additions</label>
+        <input id="additions" name="show_events" value="additions" type="radio" <%= if @show_events == "additions", do: "checked" %>>
+        <label for="additions">Additions</label>
 
-    <input id="removals" name="show_events" value="removals" type="radio" <%= if @show_events == "removals", do: "checked" %>>
-    <label for="removals">Removals</label>
+        <input id="removals" name="show_events" value="removals" type="radio" <%= if @show_events == "removals", do: "checked" %>>
+        <label for="removals">Removals</label>
 
-    <a></a>
+        <a></a>
     </div>
 </fieldset>
 </form>
 
 
-<%= for {date, events} <- @ordered_events do %>
-    <div class="timeline-item" date-is="<%= Date.to_iso8601(date) %>">
-<%= for event <- Enum.sort(events, fn e1, e2 ->
-    case DateTime.compare(e1.timestamp, e2.timestamp) do
-      :lt -> false
-      :gt -> true
-      _ -> true
-    end
-  end) do
-    time_string = Time.to_iso8601(event.timestamp)
-    {icon, description, class} = if event.type == "TRACK_ADDED" do
-      {
-        "/images/icon_add.svg",
-        "Track added at #{time_string} by #{event.user}",
-        "icon-green"
-      }
-    else
-      {
-        "/images/icon_cancel.svg",
-        "Track removed at #{time_string} by #{event.user}",
-        "icon-red"
-      }
-    end
-    icon_title = description |> String.split() |> Enum.take(2) |> Enum.join(" ")
-
-    content_tag :div, class: "card" do [
-      content_tag :div, class: "card-header" do [
-        img_tag(icon, class: "card-header-icon event-icon #{class}", title: icon_title),
-        content_tag :h5 do [
-                content_tag(:a, "#{event.track_artist} - #{event.track_name} ", href: event.track_uri),
-            ] end
-      ] end,
-      content_tag :div, class: "card-content" do [
-        content_tag(:p, description),
-        link(
-          content_tag(:button, "+ add again", class: "button button-clear"),
-          to: "#", # Routes.log_path(@conn, :add_track, event.log_id, %{"track" => %{"uri" => event.track_uri}}),
-          method: :post,
-          data: [confirm: "Are you sure you want to add this song to the playlist?"],
-          title: "Add track to playlist",
-          class: "add-track align-right"
-        )
-      ] end
-    ]
-    end
+<%= for {date, events} <- @ordered_events do
+    render("date_events.html", date: date, events: events)
 end %>
-</div>
-<%= end %>
