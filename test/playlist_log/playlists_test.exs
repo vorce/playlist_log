@@ -35,6 +35,31 @@ defmodule PlaylistLog.PlaylistsTest do
       assert length(actual) == length(expected)
       assert Enum.map(actual, fn l -> l.id end) == Enum.map(expected, fn l -> l.id end)
     end
+
+    test "returns empty list for a user without any logs" do
+      user = %{"id" => "someuserthatdidnotcreateanylist"}
+
+      assert {:ok, []} == Playlists.list_logs(user)
+    end
+  end
+
+  describe "get_log/3" do
+    test "returns an error tuple if log does not exist" do
+      user = %{"id" => "user"}
+
+      assert Playlists.get_log(user, "unknown-log-id", "token") ==
+               {:error, {:no_such_resource, {"user", "unknown-log-id"}}}
+    end
+
+    test "return log" do
+      user_id = "user_1"
+      user = %{"id" => user_id}
+      expected = [%Log{log("1", user_id) | events: [], track_count: 0}]
+      PlaylistLog.Repo.insert(Log, user_id, expected)
+
+      assert {:ok, %PlaylistLog.Playlists.Log{track_count: 2, event_count: 2}} =
+               Playlists.get_log(user, "1", "token")
+    end
   end
 
   defp log(id, owner) do

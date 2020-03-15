@@ -53,7 +53,7 @@ defmodule PlaylistLog.Playlists.Log do
       description: map["description"],
       track_count: get_in(map, ["tracks", "total"]),
       external_id: external_id,
-      collaborative: map["collaborative"],
+      collaborative: map["collaborative"] || false,
       owner_id: get_in(map, ["owner", "id"]),
       id: external_id,
       fetched_by: Keyword.get(opts, :fetched_by),

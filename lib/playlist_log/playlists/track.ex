@@ -23,7 +23,7 @@ defmodule PlaylistLog.Playlists.Track do
   def changeset(track, %{} = attrs) do
     track
     |> cast(attrs, [:name, :artists, :album, :duration_ms, :uri, :added_at, :added_by, :log_id])
-    |> validate_required([:name])
+    |> validate_required([:uri])
   end
 
   def new(raw_track) do
@@ -47,6 +47,8 @@ defmodule PlaylistLog.Playlists.Track do
   def artist_string(%__MODULE__{} = track) do
     artist_string(%{"artists" => track.artists})
   end
+
+  def artist_string(%{"artists" => nil}), do: ""
 
   def artist_string(%{"artists" => artists}) do
     artists |> Enum.map(fn artist -> artist["name"] end) |> Enum.join(", ")

@@ -59,6 +59,7 @@ defmodule PlaylistLog.Spotify do
 
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/get-playlists-tracks/
   """
+  @impl PlaylistLog.MusicClient
   def get_playlist_tracks(access_token, id) do
     headers = [Authorization: "Bearer #{access_token}"]
     url = @base_url <> "/playlists/#{id}/tracks"

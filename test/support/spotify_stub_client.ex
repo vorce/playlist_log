@@ -62,12 +62,144 @@ defmodule PlaylistLog.Test.SpotifyStubClient do
     }
   ]
   """
+  @impl PlaylistLog.MusicClient
   def get_playlists("fail") do
     {:error, {__MODULE__, %{}}}
   end
 
   def get_playlists(_access_token) do
     {:ok, Jason.decode!(@get_playlists_response)}
+  end
+
+  @get_playlist_tracks_response """
+  [
+    {
+      "added_at": "2016-10-11T13:44:40Z",
+      "added_by": {
+        "external_urls": {
+          "spotify": "http://open.spotify.com/user/spotify_espa%C3%B1a"
+        },
+        "href": "https://api.spotify.com/v1/users/spotify_espa%C3%B1a",
+        "id": "spotify_españa",
+        "type": "user",
+        "uri": "spotify:user:spotify_espa%C3%B1a"
+      },
+      "is_local": false,
+      "track": {
+        "album": {
+          "album_type": "single",
+          "artists": [
+            {
+              "external_urls": {
+                "spotify": "https://open.spotify.com/artist/21451j1KhjAiaYKflxBjr1"
+              },
+              "href": "https://api.spotify.com/v1/artists/21451j1KhjAiaYKflxBjr1",
+              "id": "21451j1KhjAiaYKflxBjr1",
+              "name": "Zion & Lennox",
+              "type": "artist",
+              "uri": "spotify:artist:21451j1KhjAiaYKflxBjr1"
+            }
+          ],
+          "available_markets": [
+            "AD",
+            "AR",
+            "AT",
+            "AU"
+          ],
+          "external_urls": {
+            "spotify": "https://open.spotify.com/album/5GjKG3Y8OvSVJO55dQTFyD"
+          },
+          "href": "https://api.spotify.com/v1/albums/5GjKG3Y8OvSVJO55dQTFyD",
+          "id": "5GjKG3Y8OvSVJO55dQTFyD",
+          "images": [
+            {
+              "height": 640,
+              "url": "https://i.scdn.co/image/b16064142fcd2bd318b08aab0b93b46e87b1ebf5",
+              "width": 640
+            },
+            {
+              "height": 300,
+              "url": "https://i.scdn.co/image/9f05124de35d807b78563ea2ca69550325081747",
+              "width": 300
+            },
+            {
+              "height": 64,
+              "url": "https://i.scdn.co/image/863c805b580a29c184fc447327e28af5dac9490b",
+              "width": 64
+            }
+          ],
+          "name": "Otra Vez (feat. J Balvin)",
+          "type": "album",
+          "uri": "spotify:album:5GjKG3Y8OvSVJO55dQTFyD"
+        },
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/21451j1KhjAiaYKflxBjr1"
+            },
+            "href": "https://api.spotify.com/v1/artists/21451j1KhjAiaYKflxBjr1",
+            "id": "21451j1KhjAiaYKflxBjr1",
+            "name": "Zion & Lennox",
+            "type": "artist",
+            "uri": "spotify:artist:21451j1KhjAiaYKflxBjr1"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1vyhD5VmyZ7KMfW5gqLgo5"
+            },
+            "href": "https://api.spotify.com/v1/artists/1vyhD5VmyZ7KMfW5gqLgo5",
+            "id": "1vyhD5VmyZ7KMfW5gqLgo5",
+            "name": "J Balvin",
+            "type": "artist",
+            "uri": "spotify:artist:1vyhD5VmyZ7KMfW5gqLgo5"
+          }
+        ],
+        "available_markets": [
+          "AD",
+          "AR",
+          "AT",
+          "AU"
+        ],
+        "disc_number": 1,
+        "duration_ms": 209453,
+        "explicit": false,
+        "external_ids": {
+          "isrc": "USWL11600423"
+        },
+        "external_urls": {
+          "spotify": "https://open.spotify.com/track/7pk3EpFtmsOdj8iUhjmeCM"
+        },
+        "href": "https://api.spotify.com/v1/tracks/7pk3EpFtmsOdj8iUhjmeCM",
+        "id": "7pk3EpFtmsOdj8iUhjmeCM",
+        "name": "Otra Vez (feat. J Balvin)",
+        "popularity": 85,
+        "preview_url": "https://p.scdn.co/mp3-preview/79c8c9edc4f1ced9dbc368f24374421ed0a33005",
+        "track_number": 1,
+        "type": "track",
+        "uri": "spotify:track:7pk3EpFtmsOdj8iUhjmeCM"
+      }
+    },
+    {
+      "added_at": "2016-10-11T13:44:40Z",
+      "added_by": {
+        "external_urls": {
+          "spotify": "http://open.spotify.com/user/spotify_espa%C3%B1a"
+        },
+        "href": "https://api.spotify.com/v1/users/spotify_espa%C3%B1a",
+        "id": "spotify_españa",
+        "type": "user",
+        "uri": "spotify:user:spotify_espa%C3%B1a"
+      },
+      "is_local": false,
+      "track": {
+          "uri": "fake"
+      }
+    }
+  ]
+  """
+  @impl PlaylistLog.MusicClient
+  def get_playlist_tracks(_access_token, _id) do
+    {:ok, Jason.decode!(@get_playlist_tracks_response)}
   end
 
   def user(), do: "wizzler"

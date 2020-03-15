@@ -61,8 +61,6 @@ defmodule PlaylistLog.Playlists do
   @doc """
   Gets a single log.
 
-  Raises `Ecto.NoResultsError` if the Log does not exist.
-
   ## Examples
 
       iex> get_log("octavorce", 1234)
