@@ -86,6 +86,21 @@
   font-size: 1.5rem;
 }
 
+.event-filters {
+  display: flex;
+  justify-content: space-between;
+  width: 40%;
+}
+
+.radio-button {
+  display: flex;
+  align-items: center;
+}
+
+.radio-button label {
+  margin-left: 10px;
+}
+
 .timeline-item {
   padding: 3em 2em 2em;
   position: relative;

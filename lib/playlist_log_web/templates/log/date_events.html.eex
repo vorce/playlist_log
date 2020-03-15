@@ -28,9 +28,9 @@
         content_tag :h5 do [
                 content_tag(:a, "#{event.track_artist} - #{event.track_name} ", href: event.track_uri),
             ] end
-      ] end
-      #content_tag :div, class: "card-content" do [
-      #  content_tag(:p, description),
+      ] end,
+      content_tag :div, class: "card-content" do [
+        content_tag(:p, description),
       #  link(
       #    content_tag(:button, "+ add again", class: "button button-clear"),
       #    to: Routes.log_path(@conn, :add_track, event.log_id, %{"track" => %{"uri" => event.track_uri}}),
@@ -39,7 +39,7 @@
       #    title: "Add track to playlist",
       #    class: "add-track align-right"
       #  )
-      #] end
+      ] end
     ]
     end
 end %>

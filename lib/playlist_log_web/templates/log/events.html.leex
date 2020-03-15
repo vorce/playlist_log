@@ -3,17 +3,21 @@
 <form phx-change="event_filter_change">
 <fieldset>
     <legend>Show</legend>
-    <div style="display: flex;">
-        <input id="all" name="show_events" value="all" type="radio" <%= if @show_events == "all", do: "checked" %>>
-        <label for="all">All</label>
+    <div class="event-filters">
+        <div class="radio-button">
+            <input id="all" name="show_events" value="all" type="radio" <%= if @show_events == "all", do: "checked" %>>
+            <label for="all">All</label>
+        </div>
 
-        <input id="additions" name="show_events" value="additions" type="radio" <%= if @show_events == "additions", do: "checked" %>>
-        <label for="additions">Additions</label>
+        <div class="radio-button">
+            <input id="additions" name="show_events" value="additions" type="radio" <%= if @show_events == "additions", do: "checked" %>>
+            <label for="additions">Additions</label>
+        </div>
 
-        <input id="removals" name="show_events" value="removals" type="radio" <%= if @show_events == "removals", do: "checked" %>>
-        <label for="removals">Removals</label>
-
-        <a></a>
+        <div class="radio-button">
+            <input id="removals" name="show_events" value="removals" type="radio" <%= if @show_events == "removals", do: "checked" %>>
+            <label for="removals">Removals</label>
+        </div>
     </div>
 </fieldset>
 </form>
