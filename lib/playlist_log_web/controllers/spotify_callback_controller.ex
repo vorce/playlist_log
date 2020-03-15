@@ -7,7 +7,6 @@ defmodule PlaylistLogWeb.SpotifyCallbackController do
          {:ok, user_info} <- PlaylistLog.Spotify.get_me(spotify_access_token) do
       conn
       |> put_session(:spotify_user, user_info)
-      |> put_flash(:info, "Successfully authenticated with Spotify")
       |> redirect(to: last_path(conn))
     else
       {:error, reason, conn} ->
