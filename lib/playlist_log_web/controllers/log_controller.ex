@@ -145,7 +145,7 @@ defmodule PlaylistLogWeb.LogController do
              spotify_access_token
            ) do
       conn
-      |> put_flash(:info, "Playlist track deleted successfully.")
+      |> put_flash(:info, "Playlist track removed successfully.")
       |> redirect(to: Routes.log_path(conn, :show, log.id))
     end
   end
