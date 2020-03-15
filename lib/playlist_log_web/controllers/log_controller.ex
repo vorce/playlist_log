@@ -156,7 +156,7 @@ defmodule PlaylistLogWeb.LogController do
 
     with {:ok, log} <- Playlists.get_log(spotify_user, log_id, spotify_access_token),
          {:ok, tracks} <-
-           Playlists.add_tracks(spotify_user, log, [track_uri], spotify_access_token),
+           Playlists.add_tracks(log, [track_uri], spotify_access_token),
          {:ok, track} <- Map.fetch(tracks, track_uri) do
       conn
       |> put_flash(:info, "#{track.artist} - #{track.name} added successfully")

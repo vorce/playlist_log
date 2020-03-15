@@ -45,7 +45,8 @@ defmodule PlaylistLog.MixProject do
       {:spotify_ex, "~> 2.0"},
       {:httpoison, "~> 1.0"},
       {:phoenix_live_view, "~> 0.9"},
-      {:floki, ">= 0.0.0", only: :test}
+      {:floki, ">= 0.0.0", only: :test},
+      {:navigation_history, "~> 0.3"}
     ]
   end
 end

@@ -20,7 +20,7 @@ defmodule PlaylistLogWeb.LogLiveView do
   end
 
   def handle_event("event_filter_change", %{"show_events" => show_events}, socket) do
-    Logger.debug("Showing #{show_events} events")
+    Logger.debug("Event filter changed, showing #{show_events} events")
 
     filtered_events =
       case show_events do

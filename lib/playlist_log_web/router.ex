@@ -8,6 +8,7 @@ defmodule PlaylistLogWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug NavigationHistory.Tracker, excluded_paths: [~r(/spotify_callback*)]
   end
 
   pipeline :api do

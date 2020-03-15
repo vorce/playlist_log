@@ -8,7 +8,7 @@ defmodule PlaylistLogWeb.SpotifyCallbackController do
       conn
       |> put_session(:spotify_user, user_info)
       |> put_flash(:info, "Successfully authenticated with Spotify")
-      |> redirect(to: Routes.log_path(conn, :index))
+      |> redirect(to: last_path(conn))
     else
       {:error, reason, conn} ->
         conn
@@ -19,5 +19,9 @@ defmodule PlaylistLogWeb.SpotifyCallbackController do
 
   def logout(_conn, _params) do
     # TODO
+  end
+
+  defp last_path(conn) do
+    NavigationHistory.last_path(conn, default: Routes.log_path(conn, :index))
   end
 end

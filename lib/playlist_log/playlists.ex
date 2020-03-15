@@ -246,10 +246,9 @@ defmodule PlaylistLog.Playlists do
     end
   end
 
-  def add_tracks(user, %Log{} = log, track_uris, access_token) do
+  def add_tracks(%Log{} = log, track_uris, access_token) do
     with {:ok, new_snapshot_id} <-
            spotify().add_tracks_to_playlist(access_token, log.id, track_uris),
-         {:ok, user_id} <- Map.fetch(user, "id"),
          changeset <-
            Log.changeset(log, %{
              snapshot_id: new_snapshot_id,
