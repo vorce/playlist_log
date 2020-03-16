@@ -14,7 +14,7 @@
     <%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
       <%= label f, :uri, "Spotify URI" %>
       <div class="row">
-          <div class="column column-60"><%= text_input f, :uri, value: "" %></div>
+          <div class="column column-60"><%= text_input f, :uri, value: "", placeholder: "spotify:track:2oi3gjrmsdb8GpcgtH9Mn6" %></div>
           <div class="column"><%= submit "Add track", method: :post %></div>
       </div>
     <% end %>
