@@ -16,7 +16,8 @@ of the playlist at some point.
 
 ## TODO
 
-- Admin page: Be able to remove individual events for any user.
+See [github issues](https://github.com/vorce/playlist_log/issues)
+
 
 ## Storage details
 
