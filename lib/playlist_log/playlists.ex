@@ -215,6 +215,9 @@ defmodule PlaylistLog.Playlists do
     Log.changeset(log, %{})
   end
 
+  @doc """
+  Delete a track from a spotify playlist (and its log)
+  """
   def delete_tracks(user, log_id, snapshot_id, track_uris, access_token) do
     with {:ok, new_snapshot_id} <-
            spotify().delete_tracks_from_playlist(access_token, log_id, snapshot_id, track_uris),
@@ -227,20 +230,31 @@ defmodule PlaylistLog.Playlists do
              track_count: log.track_count - length(track_uris)
            }),
          :ok <- Repo.update(changeset) do
-      Enum.each(track_uris, fn track_uri ->
-        track = Enum.find(log.tracks, fn track -> track.uri == track_uri end)
-        track_artist = Track.artist_string(track)
+      result =
+        Enum.reduce(track_uris, %{}, fn track_uri, acc ->
+          track = Enum.find(log.tracks, fn track -> track.uri == track_uri end)
+          track_artist = Track.artist_string(track)
 
-        create_event(log_id, %{
-          timestamp: DateTime.utc_now(),
-          type: "TRACK_REMOVED",
-          user: user_id,
-          track_uri: track_uri,
-          track_name: track.name,
-          track_artist: track_artist,
-          log_id: log_id
-        })
-      end)
+          create_event(log_id, %{
+            timestamp: DateTime.utc_now(),
+            type: "TRACK_REMOVED",
+            user: user_id,
+            track_uri: track_uri,
+            track_name: track.name,
+            track_artist: track_artist,
+            log_id: log_id
+          })
+
+          simplified_track = %{
+            artist: track_artist,
+            name: track.name,
+            uri: track_uri
+          }
+
+          Map.put(acc, track_uri, simplified_track)
+        end)
+
+      {:ok, result}
     end
   end
 

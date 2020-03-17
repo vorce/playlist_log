@@ -202,5 +202,10 @@ defmodule PlaylistLog.Test.SpotifyStubClient do
     {:ok, Jason.decode!(@get_playlist_tracks_response)}
   end
 
+  @impl PlaylistLog.MusicClient
+  def delete_tracks_from_playlist(_access_token, _playlist_id, snapshot_id, _track_uris) do
+    {:ok, String.reverse(snapshot_id)}
+  end
+
   def user(), do: "wizzler"
 end

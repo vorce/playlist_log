@@ -79,6 +79,7 @@ defmodule PlaylistLog.Spotify do
 
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/remove-tracks-playlist/
   """
+  @impl PlaylistLog.MusicClient
   def delete_tracks_from_playlist(access_token, playlist_id, snapshot_id, track_uris) do
     headers = [Authorization: "Bearer #{access_token}", "Content-type": "application/json"]
     url = @base_url <> "/playlists/#{playlist_id}/tracks"

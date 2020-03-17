@@ -2,7 +2,6 @@ defmodule PlaylistLogWeb.LogController do
   use PlaylistLogWeb, :controller
   plug PlaylistLogWeb.Plugs.SpotifyAuth
 
-  alias Phoenix.LiveView.Controller
   alias PlaylistLog.Playlists
   alias PlaylistLog.Playlists.Event
   alias PlaylistLog.Playlists.Log
@@ -136,16 +135,17 @@ defmodule PlaylistLogWeb.LogController do
     spotify_access_token = conn.cookies["spotify_access_token"]
 
     with {:ok, log} <- Playlists.get_log(spotify_user, log_id, spotify_access_token),
-         :ok <-
+         {:ok, tracks} <-
            Playlists.delete_tracks(
              spotify_user,
              log.id,
              snapshot_id,
              [track_uri],
              spotify_access_token
-           ) do
+           ),
+         {:ok, track} <- Map.fetch(tracks, track_uri) do
       conn
-      |> put_flash(:info, "Playlist track removed successfully.")
+      |> put_flash(:info, "#{track.artist} - #{track.name} removed successfully")
       |> redirect(to: Routes.log_path(conn, :show, log.id))
     end
   end

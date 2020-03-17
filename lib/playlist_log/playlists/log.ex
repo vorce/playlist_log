@@ -10,7 +10,7 @@ defmodule PlaylistLog.Playlists.Log do
   schema "logs" do
     field(:name, :string)
     field(:description, :string)
-    field(:track_count, :integer)
+    field(:track_count, :integer, default: 0)
     field(:external_id, :string)
     field(:collaborative, :boolean)
     field(:owner_id, :string)
