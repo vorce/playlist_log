@@ -39,34 +39,17 @@ defmodule PlaylistLogWeb.LogController do
     end
   end
 
-  def new(conn, _params) do
-    changeset = Playlists.change_log(%Log{})
-    render(conn, "new.html", changeset: changeset)
-  end
-
-  def create(conn, %{"log" => log_params}) do
-    case Playlists.create_log(log_params) do
-      {:ok, log} ->
-        conn
-        |> put_flash(:info, "Log created successfully.")
-        |> redirect(to: Routes.log_path(conn, :show, log))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
-    end
-  end
-
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"id" => id} = params) do
+    show_events = Map.get(params, "show_events", "all")
     spotify_user = get_session(conn, :spotify_user)
     spotify_access_token = conn.cookies["spotify_access_token"]
 
     with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token),
-         ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2),
-         ordered_events <- Event.order_by_date(log.events) do
+         ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2) do
       render(conn, "show.html",
         log: log,
         ordered_tracks: ordered_tracks,
-        ordered_events: ordered_events
+        show_events: show_events
       )
     else
       {:error, reason} ->
@@ -86,44 +69,6 @@ defmodule PlaylistLogWeb.LogController do
       :gt -> true
       _ -> true
     end
-  end
-
-  def edit(conn, %{"id" => id}) do
-    spotify_user = get_session(conn, :spotify_user)
-    spotify_access_token = conn.cookies["spotify_access_token"]
-
-    with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token) do
-      changeset = Playlists.change_log(log)
-      render(conn, "edit.html", log: log, changeset: changeset)
-    else
-      {:error, reason} ->
-        conn
-        |> put_flash(:error, "Unable to update playlist: #{inspect(reason)}")
-        |> redirect(to: Routes.log_path(conn, :index))
-    end
-  end
-
-  def update(_conn, %{"id" => _id, "log" => _log_params}) do
-    # log = Playlists.get_log!(id)
-
-    # case Playlists.update_log(log, log_params) do
-    #   {:ok, log} ->
-    #     conn
-    #     |> put_flash(:info, "Log updated successfully.")
-    #     |> redirect(to: Routes.log_path(conn, :show, log))
-
-    #   {:error, %Ecto.Changeset{} = changeset} ->
-    #     render(conn, "edit.html", log: log, changeset: changeset)
-    # end
-  end
-
-  def delete(_conn, %{"id" => _id}) do
-    # log = Playlists.get_log!(id)
-    # {:ok, _log} = Playlists.delete_log(log)
-
-    # conn
-    # |> put_flash(:info, "Log deleted successfully.")
-    # |> redirect(to: Routes.log_path(conn, :index))
   end
 
   def delete_track(conn, %{

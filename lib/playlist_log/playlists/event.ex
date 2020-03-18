@@ -59,4 +59,21 @@ defmodule PlaylistLog.Playlists.Event do
       _ -> true
     end
   end
+
+  def filtered_events(events, show_events) when is_list(events) do
+    case show_events do
+      "all" ->
+        order_by_date(events)
+
+      "additions" ->
+        events
+        |> Enum.filter(fn event -> event.type == "TRACK_ADDED" end)
+        |> order_by_date()
+
+      "removals" ->
+        events
+        |> Enum.filter(fn event -> event.type == "TRACK_REMOVED" end)
+        |> order_by_date()
+    end
+  end
 end

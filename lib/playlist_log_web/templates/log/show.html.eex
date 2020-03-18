@@ -38,9 +38,8 @@
   </div>
 
   <div class="column column-50">
-    <%= live_render(@conn, PlaylistLogWeb.LogLiveView, session: %{"show_events" => "all", "events" => @log.events, "ordered_events" => @ordered_events}) %>
+    <%= live_render(@conn, PlaylistLogWeb.LogLiveView, session: %{"show_events" => @show_events, "events" => @log.events}) %>
   </div>
 </div>
 
-<span><%= link "Edit", to: Routes.log_path(@conn, :edit, @log) %></span>
 <span><%= link "Back", to: Routes.log_path(@conn, :index) %></span>
