@@ -8,7 +8,7 @@
 </div>
 
 <div class="row">
-  <div class="column column-50">
+  <div class="column column-60">
     <h3 badge="<%= length(@ordered_tracks) %>">Current tracks</h3>
 
     <%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
@@ -37,7 +37,7 @@
     </table>
   </div>
 
-  <div class="column column-50">
+  <div class="column column-40">
     <%= live_render(@conn, PlaylistLogWeb.LogLiveView, session: %{"show_events" => @show_events, "events" => @log.events}) %>
   </div>
 </div>
