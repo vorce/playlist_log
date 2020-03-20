@@ -193,30 +193,23 @@ defmodule PlaylistLog.Playlists do
     end
   end
 
-  def add_tracks(%Log{} = log, track_uris, access_token) do
-    with {:ok, new_snapshot_id} <-
-           spotify().add_tracks_to_playlist(access_token, log.id, track_uris),
+  def add_track(%Log{} = log, track_uri, access_token) do
+    with {:ok, raw_track} <- spotify().get_track(track_uri, access_token),
+         {:ok, new_snapshot_id} <-
+           spotify().add_tracks_to_playlist(access_token, log.id, [track_uri]),
          changeset <-
            Log.changeset(log, %{
              snapshot_id: new_snapshot_id,
-             event_count: log.event_count + length(track_uris),
-             track_count: log.track_count + length(track_uris)
+             event_count: log.event_count + 1,
+             track_count: log.track_count + 1
            }),
          :ok <- Repo.update(changeset) do
-      result =
-        Enum.reduce(track_uris, %{}, fn track_uri, acc ->
-          with {:ok, raw_track} <- spotify().get_track(track_uri, access_token) do
-            simplified_track = %{
-              artist: Track.artist_string(raw_track),
-              name: raw_track["name"],
-              uri: track_uri
-            }
-
-            Map.put(acc, track_uri, simplified_track)
-          end
-        end)
-
-      {:ok, result}
+      {:ok,
+       %{
+         artist: Track.artist_string(raw_track),
+         name: raw_track["name"],
+         uri: track_uri
+       }}
     end
   end
 

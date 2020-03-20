@@ -105,6 +105,7 @@ defmodule PlaylistLog.Spotify do
 
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/add-tracks-to-playlist/
   """
+  @impl PlaylistLog.MusicClient
   def add_tracks_to_playlist(access_token, playlist_id, track_uris) do
     headers = [Authorization: "Bearer #{access_token}", "Content-type": "application/json"]
     url = @base_url <> "/playlists/#{playlist_id}/tracks"
@@ -124,22 +125,26 @@ defmodule PlaylistLog.Spotify do
     end
   end
 
+  @impl PlaylistLog.MusicClient
   def get_track("spotify:track:" <> track_id, access_token) do
     get_track(track_id, access_token)
   end
 
+  @impl PlaylistLog.MusicClient
   def get_track(track_id, access_token) do
     headers = [Authorization: "Bearer #{access_token}"]
     url = @base_url <> "/tracks/#{track_id}"
 
-    with {:ok, %HTTPoison.Response{status_code: 200, body: response_body}} <-
-           HTTPoison.get(url, headers),
-         {:ok, response} <- Jason.decode(response_body) do
-      {:ok, response}
-    else
-      other ->
-        handle_unexpected_response(url, other)
-    end
+    ConCache.fetch_or_store(:track_cache, track_id, fn ->
+      with {:ok, %HTTPoison.Response{status_code: 200, body: response_body}} <-
+             HTTPoison.get(url, headers),
+           {:ok, response} <- Jason.decode(response_body) do
+        {:ok, response}
+      else
+        other ->
+          handle_unexpected_response(url, other)
+      end
+    end)
   end
 
   defp handle_unexpected_response(url, {:ok, %HTTPoison.Response{status_code: 429, body: body}}) do

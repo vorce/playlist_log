@@ -95,6 +95,30 @@ defmodule PlaylistLog.PlaylistsTest do
     end
   end
 
+  describe "add_track/3" do
+    test "returns track info on success" do
+      uri = "spotify:track:1"
+      user_id = "user_3"
+
+      existing_log = %Log{
+        log(user_id, user_id)
+        | tracks: [],
+          track_count: 0,
+          events: [],
+          event_count: 0
+      }
+
+      PlaylistLog.Repo.insert(Log, user_id, [existing_log])
+
+      assert {:ok,
+              %{
+                artist: _,
+                name: _,
+                uri: uri
+              }} = Playlists.add_track(existing_log, uri, "token")
+    end
+  end
+
   defp log(id, owner) do
     Log.new(%{"id" => id, "name" => id, "owner" => %{"id" => owner}})
   end

@@ -8,13 +8,11 @@ defmodule PlaylistLog.Application do
   @cubdb_data_dir Application.get_env(:playlist_log, PlaylistLog.Repo)[:data_dir]
 
   def start(_type, _args) do
-    # List all child processes to be supervised
     children = [
-      # Start the endpoint when the application starts
+      {ConCache,
+       [name: :track_cache, ttl_check_interval: :timer.minutes(1), global_ttl: :timer.minutes(30)]},
       CubDB.child_spec(data_dir: @cubdb_data_dir, auto_compact: true, name: :cubdb),
       PlaylistLogWeb.Endpoint
-      # Starts a worker by calling: PlaylistLog.Worker.start_link(arg)
-      # {PlaylistLog.Worker, arg},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

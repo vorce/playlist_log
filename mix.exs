@@ -46,7 +46,8 @@ defmodule PlaylistLog.MixProject do
       {:httpoison, "~> 1.0"},
       {:phoenix_live_view, "~> 0.10"},
       {:floki, ">= 0.0.0", only: :test},
-      {:navigation_history, "~> 0.3"}
+      {:navigation_history, "~> 0.3"},
+      {:con_cache, "~> 0.14"}
     ]
   end
 end
