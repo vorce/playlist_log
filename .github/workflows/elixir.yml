@@ -27,3 +27,5 @@ jobs:
         name: vorce/playlistlog
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+      env:
+        SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
