@@ -21,3 +21,9 @@ jobs:
     #   run: mix credo
     - name: Run Tests
       run: mix test
+    - name: Build and publish docker image
+      uses: HurricanKai/Publish-Docker-Github-Action@master
+      with:
+        name: vorce/playlistlog
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
