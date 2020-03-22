@@ -27,6 +27,6 @@ jobs:
         username: "${{ secrets.DOCKER_USERNAME }}"
         password: "${{ secrets.DOCKER_PASSWORD }}"
         image_name: vorce/playlistlog
-        image_tag: latest,${{ GITHUB_SHA }}
+        image_tag: latest,"${{ GITHUB_SHA }}"
         push_git_tag: true
         build_extra_args: "--build-arg=SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}"
