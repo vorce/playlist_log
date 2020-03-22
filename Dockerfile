@@ -1,5 +1,8 @@
 FROM elixir:1.9.0-alpine AS build
 
+ARG SECRET_KEY_BASE
+ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
+
 # install build dependencies
 RUN apk add --update build-base npm git
 
