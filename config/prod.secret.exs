@@ -19,8 +19,8 @@ config :playlist_log, PlaylistLogWeb.Endpoint,
 #
 # If you are doing OTP releases, you need to instruct Phoenix
 # to start each relevant endpoint:
-#
-#     config :playlist_log, PlaylistLogWeb.Endpoint, server: true
-#
+
+config :playlist_log, PlaylistLogWeb.Endpoint, server: true
+
 # Then you can assemble a release by calling `mix release`.
 # See `mix help release` for more information.
