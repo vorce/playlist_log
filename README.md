@@ -14,6 +14,39 @@ of the playlist at some point.
 - Overview of current songs in playlist + changes for the playlist (changes are either track additions or removals)
 - In the playlist overview you can add and delete tracks to/from the playlist, doing this will create new changes/events.
 
+## Docker
+
+Docker images are published to: https://hub.docker.com/r/vorce/playlistlog
+
+Example run:
+```bash
+docker run --name playlistlog -d -p 4000:4000 -e SECRET_KEY_BASE=... -e SPOTIFY_CLIENT_ID=... -e SPOTIFY_CLIENT_SECRET=... -e SPOTIFY_REDIRECT_URI=http://localhost:4000/spotify_callback vorce/playlistlog:latest /app/bin/playlist_log start
+```
+
+## Data export + import
+
+Example of exporting all events for a log with id "logid", and importing them elsewhere.
+
+### Export
+
+From an iex session:
+
+```elixir
+{:ok, events} = PlaylistLog.Repo.all(PlaylistLog.Playlists.Event, "logid")
+events_binary = :erlang.term_to_binary(events)
+File.write("myexport.txt", events_binary)
+```
+
+### Import
+
+Iex again:
+
+```elixir
+events_binary = File.read!("myexport.txt")
+events = :erlang.binary_to_term(events_binary)
+Enum.each(events, fn e -> PlaylistLog.Repo.insert(PlaylistLog.Playlists.Event, "logid", e) end)
+```
+
 ## TODO
 
 See [github issues](https://github.com/vorce/playlist_log/issues)
