@@ -42,7 +42,7 @@ defmodule PlaylistLog.MixProject do
       {:cubdb, "~> 0.17"},
       {:ecto, "~> 3.3"},
       {:phoenix_ecto, "~> 4.0"},
-      {:spotify_ex, "~> 2.0"},
+      {:spotify_ex, "~> 2.0.9"},
       {:httpoison, "~> 1.0"},
       {:phoenix_live_view, "~> 0.10"},
       {:floki, ">= 0.0.0", only: :test},
