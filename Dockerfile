@@ -1,4 +1,4 @@
-FROM elixir:1.9.0-alpine AS build
+FROM hexpm/elixir:1.10.2-erlang-22.2.8-alpine-3.11.3 AS build
 
 ARG SECRET_KEY_BASE
 ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
