@@ -19,8 +19,17 @@ config :playlist_log, PlaylistLogWeb.Endpoint,
 #
 # If you are doing OTP releases, you need to instruct Phoenix
 # to start each relevant endpoint:
-
 config :playlist_log, PlaylistLogWeb.Endpoint, server: true
 
-# Then you can assemble a release by calling `mix release`.
-# See `mix help release` for more information.
+config :spotify_ex,
+  client_id: System.get_env("SPOTIFY_CLIENT_ID"),
+  secret_key: System.get_env("SPOTIFY_CLIENT_SECRET"),
+  callback_url:
+    System.get_env("SPOTIFY_REDIRECT_URI") || "http://localhost:4000/spotify_callback",
+  user_id: "unknown",
+  scopes: [
+    "playlist-modify-public",
+    "playlist-modify-private",
+    "playlist-read-private",
+    "playlist-read-collaborative"
+  ]
