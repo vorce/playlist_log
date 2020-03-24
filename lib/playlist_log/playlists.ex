@@ -55,7 +55,7 @@ defmodule PlaylistLog.Playlists do
   end
 
   defp alphabetically(log1, log2) do
-    log1.name <= log2.name
+    String.downcase(log1.name) <= String.downcase(log2.name)
   end
 
   @doc """

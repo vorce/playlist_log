@@ -1,10 +1,12 @@
-# PlaylistLog
+# Playlistlog
 
-A log / timeline of song additions and removals for a Spotify playlist.
+Playlistlog is a tool to manage your Spotify playlists with.
+The primary purpose is to provide a log / timeline of song additions and removals for a Spotify playlist.
 
-I use this to keep a sliding window of around 50 tracks that I dig at the moment.
-By using PlaylistLog I get a nice historic timelime of previous tracks that was part
-of the playlist at some point.
+I use this to keep a sliding window of around [50 tracks](https://open.spotify.com/playlist/3AecNkQNg9GhbYLV9G3z85?si=dxvTMROhSuyUS2LODNi7lQ) that I dig at the moment.
+By using Playlistlog I get a nice historic timelime of songs that was part
+of the playlist previously at some point. This is useful for me to just be able to look back at what I liked
+a year ago or whatever.
 
 ## Workflow
 
