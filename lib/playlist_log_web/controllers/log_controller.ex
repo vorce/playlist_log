@@ -12,7 +12,7 @@ defmodule PlaylistLogWeb.LogController do
     spotify_access_token = conn.cookies["spotify_access_token"]
 
     with {:ok, logs} <- Playlists.list_playlists(spotify_user, spotify_access_token) do
-      render(conn, "index.html", logs: Enum.sort(logs, fn l1, l2 -> l1.name <= l2.name end))
+      render(conn, "index.html", logs: Enum.sort(logs, &Log.alphabetically/2))
     else
       {:error, error} ->
         error_message = get_in(error, ["error", "message"])
@@ -28,7 +28,7 @@ defmodule PlaylistLogWeb.LogController do
     # spotify_access_token = conn.cookies["spotify_access_token"]
 
     with {:ok, logs} <- Playlists.list_logs(spotify_user) do
-      render(conn, "index.html", logs: Enum.sort(logs, fn l1, l2 -> l1.name <= l2.name end))
+      render(conn, "index.html", logs: Enum.sort(logs, &Log.alphabetically/2))
     else
       {:error, error} ->
         error_message = get_in(error, ["error", "message"])

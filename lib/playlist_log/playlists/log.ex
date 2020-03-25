@@ -61,4 +61,8 @@ defmodule PlaylistLog.Playlists.Log do
       snapshot_id: map["snapshot_id"]
     }
   end
+
+  def alphabetically(log1, log2) do
+    String.downcase(log1.name) <= String.downcase(log2.name)
+  end
 end
