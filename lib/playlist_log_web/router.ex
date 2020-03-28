@@ -28,8 +28,9 @@ defmodule PlaylistLogWeb.Router do
     get "/spotify_callback", SpotifyCallbackController, :authenticate
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", PlaylistLogWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", PlaylistLogWeb do
+    pipe_through :api
+
+    post "/dockerhub", DockerhubController, :webhook
+  end
 end

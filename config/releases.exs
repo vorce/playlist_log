@@ -33,3 +33,6 @@ config :spotify_ex,
     "playlist-read-private",
     "playlist-read-collaborative"
   ]
+
+config :playlist_log, PlaylistLogWeb.DockerhubController,
+  key: System.get_env("DOCKERHUB_WEBHOOK_KEY")

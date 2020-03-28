@@ -3,7 +3,6 @@ defmodule PlaylistLogWeb.LogController do
   plug PlaylistLogWeb.Plugs.SpotifyAuth
 
   alias PlaylistLog.Playlists
-  alias PlaylistLog.Playlists.Event
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
 
