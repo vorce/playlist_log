@@ -41,6 +41,10 @@ RUN mix release
 FROM alpine:3.11.3 AS app
 RUN apk add --update bash openssl
 
+# ensures that /var/run/docker.sock exists,
+# with permissions for the user that runs the app
+RUN touch /var/run/docker.sock && chown nobody:nobody /var/run/docker.sock
+
 RUN mkdir /app
 WORKDIR /app
 
