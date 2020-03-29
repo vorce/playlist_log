@@ -72,10 +72,14 @@ defmodule PlaylistLog.Dockerhub do
 
   defp update_payload(tag) do
     %{
+      "Name" => "playlistlog",
       "TaskTemplate" => %{
         "ContainerSpec" => %{
           "Image" => "vorce/playlistlog:#{tag}"
         }
+      },
+      "UpdateConfig" => %{
+        "Order" => "start-first"
       }
     }
   end
