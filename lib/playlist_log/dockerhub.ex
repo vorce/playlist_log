@@ -38,7 +38,7 @@ defmodule PlaylistLog.Dockerhub do
 
   @protocol "http+unix://"
   def get_service_details() do
-    url = @protocol <> @socket_path <> "/localhost/services"
+    url = @protocol <> @socket_path <> "/services"
 
     with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(url),
          {:ok, services} <- Jason.decode(body),
@@ -58,7 +58,7 @@ defmodule PlaylistLog.Dockerhub do
   end
 
   def update_service(id, version, tag) do
-    url = @protocol <> @socket_path <> "/localhost/services/#{id}/update?version=#{version}"
+    url = @protocol <> @socket_path <> "/services/#{id}/update?version=#{version}"
     headers = ["content-type": "application/json"]
     payload = update_payload(tag)
     details = [url: url, id: id, version: version, tag: tag, payload: payload]
