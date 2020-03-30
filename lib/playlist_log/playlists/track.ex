@@ -1,4 +1,8 @@
 defmodule PlaylistLog.Playlists.Track do
+  @moduledoc """
+  Playlists contains Tracks. A track can for example be a song + artist, and other metadata.
+  (it could also be a podcast episode, etc.)
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

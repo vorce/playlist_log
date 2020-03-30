@@ -48,7 +48,8 @@ defmodule PlaylistLog.MixProject do
       {:floki, ">= 0.0.0", only: :test},
       {:navigation_history, "~> 0.3"},
       {:con_cache, "~> 0.14"},
-      {:bypass, "~> 1.0", only: :test}
+      {:bypass, "~> 1.0", only: :test},
+      {:credo, "~> 1.2", only: [:dev, :test], runtime: false}
     ]
   end
 end

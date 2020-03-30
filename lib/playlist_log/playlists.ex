@@ -14,8 +14,9 @@ defmodule PlaylistLog.Playlists do
   # Spotify client from config
   defp spotify(), do: Application.get_env(:playlist_log, PlaylistLog.Playlists)[:spotify_client]
 
-  # TODO: This is probably the first you have to do when coming to /logs
-  # and after adding a new playlist to spotify or changing its properties (like name, description)
+  @doc """
+  Get playlists from spotify and returns them as `Log`s.
+  """
   def list_playlists(user, access_token) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
          {:ok, playlists} <- spotify().get_playlists(access_token),

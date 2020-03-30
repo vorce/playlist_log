@@ -1,4 +1,7 @@
 defmodule PlaylistLog.Playlists.Log do
+  @moduledoc """
+  A log is a playlist of tracks, and a timeline of events for that playlist.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

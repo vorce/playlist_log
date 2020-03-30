@@ -1,4 +1,7 @@
 defmodule PlaylistLog.Playlists.Event do
+  @moduledoc """
+  Events are either track additions or removals from a playlist.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

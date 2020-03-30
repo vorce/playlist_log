@@ -7,14 +7,15 @@ defmodule PlaylistLogWeb.Plugs.SpotifyAuth do
   def call(conn, _default) do
     authenticated? = Spotify.Authentication.authenticated?(conn)
 
-    unless authenticated? do
+    if authenticated? do
+      case refresh(conn) do
+        {:ok, conn} ->
+          conn
+      end
+    else
       conn
       |> Phoenix.Controller.redirect(external: Spotify.Authorization.url())
       |> Plug.Conn.halt()
-    else
-      with {:ok, conn} <- refresh(conn) do
-        conn
-      end
     end
   end
 

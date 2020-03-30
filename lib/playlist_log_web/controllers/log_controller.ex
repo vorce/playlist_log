@@ -10,9 +10,10 @@ defmodule PlaylistLogWeb.LogController do
     spotify_user = get_session(conn, :spotify_user)
     spotify_access_token = conn.cookies["spotify_access_token"]
 
-    with {:ok, logs} <- Playlists.list_playlists(spotify_user, spotify_access_token) do
-      render(conn, "index.html", logs: Enum.sort(logs, &Log.alphabetically/2))
-    else
+    case Playlists.list_playlists(spotify_user, spotify_access_token) do
+      {:ok, logs} ->
+        render(conn, "index.html", logs: Enum.sort(logs, &Log.alphabetically/2))
+
       {:error, error} ->
         error_message = get_in(error, ["error", "message"])
 
@@ -26,9 +27,10 @@ defmodule PlaylistLogWeb.LogController do
     spotify_user = get_session(conn, :spotify_user)
     # spotify_access_token = conn.cookies["spotify_access_token"]
 
-    with {:ok, logs} <- Playlists.list_logs(spotify_user) do
-      render(conn, "index.html", logs: Enum.sort(logs, &Log.alphabetically/2))
-    else
+    case Playlists.list_logs(spotify_user) do
+      {:ok, logs} ->
+        render(conn, "index.html", logs: Enum.sort(logs, &Log.alphabetically/2))
+
       {:error, error} ->
         error_message = get_in(error, ["error", "message"])
 
