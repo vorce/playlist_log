@@ -41,9 +41,12 @@ RUN mix release
 FROM alpine:3.11.3 AS app
 RUN apk add --update bash openssl
 
-# ensures that /var/run/docker.sock exists,
-# with permissions for the user that runs the app
+# Unsure if the RUN command actually acomplishes anything, since when mounting
+# in the docker socket it will have the permissions of the host...
 RUN touch /var/run/docker.sock && chown nobody:nobody /var/run/docker.sock
+
+# Add nobody to grp 999 (ping)
+RUN addgroup nobody ping
 
 RUN mkdir /app
 WORKDIR /app
