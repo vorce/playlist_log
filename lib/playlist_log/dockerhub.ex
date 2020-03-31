@@ -63,13 +63,13 @@ defmodule PlaylistLog.Dockerhub do
 
   Docker API docs: https://docs.docker.com/engine/api/v1.40/#operation/ServiceUpdate
   """
-  def update_service(id, version, tag) do
-    url = @base_url <> "/services/#{id}/update?version=#{version}"
+  def update_service(id, version, tag, base_url \\ @base_url) do
+    url = base_url <> "/services/#{id}/update?version=#{version}"
     headers = ["content-type": "application/json"]
     payload = update_payload(tag)
     details = [url: url, id: id, version: version, tag: tag, payload: payload]
 
-    case HTTPoison.post(url, payload, headers) do
+    case HTTPoison.post(url, Jason.encode!(payload), headers) do
       {:ok, %HTTPoison.Response{status_code: 200}} ->
         Logger.info("Successfully updated service, details: #{inspect(details)}")
 

@@ -177,6 +177,11 @@ defmodule PlaylistLog.DockerhubTest do
   ]
   """
 
+  setup do
+    bypass = Bypass.open()
+    {:ok, bypass: bypass}
+  end
+
   describe "find_service_details/1" do
     test "gets playlistlog service" do
       assert {:ok, %{}} = Dockerhub.find_service_details(Jason.decode!(@example_services))
@@ -191,6 +196,23 @@ defmodule PlaylistLog.DockerhubTest do
         |> List.wrap()
 
       assert Dockerhub.find_service_details(services) == {:error, :no_playlistlog_service}
+    end
+  end
+
+  describe "update_service/4" do
+    test "posts payload to docker API", %{bypass: bypass} do
+      id = "id1"
+      version = "version1"
+      base_url = "http://localhost:#{bypass.port}"
+
+      Bypass.expect_once(bypass, fn conn ->
+        assert conn.request_path == "/services/#{id}/update"
+        assert conn.query_string == "version=#{version}"
+        # TODO check body payload
+        Plug.Conn.resp(conn, 200, "OK")
+      end)
+
+      assert Dockerhub.update_service(id, version, "tag1", base_url) == :ok
     end
   end
 end
