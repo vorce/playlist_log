@@ -208,7 +208,7 @@ defmodule PlaylistLog.DockerhubTest do
       Bypass.expect_once(bypass, fn conn ->
         assert conn.request_path == "/services/#{id}/update"
         assert conn.query_string == "version=#{version}"
-        # TODO check body payload
+        # check body payload?
         Plug.Conn.resp(conn, 200, "OK")
       end)
 
