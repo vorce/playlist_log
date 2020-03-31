@@ -69,7 +69,7 @@ defmodule PlaylistLog.Dockerhub do
     payload = update_payload(tag)
     details = [url: url, id: id, version: version, tag: tag, payload: payload]
 
-    case HTTPoison.post(url, headers, payload) do
+    case HTTPoison.post(url, payload, headers) do
       {:ok, %HTTPoison.Response{status_code: 200}} ->
         Logger.info("Successfully updated service, details: #{inspect(details)}")
 
