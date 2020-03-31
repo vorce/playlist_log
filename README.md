@@ -8,6 +8,8 @@ By using Playlistlog I get a nice historic timelime of songs that was part
 of the playlist previously at some point. This is useful for me to just be able to look back at what I liked
 a year ago or whatever.
 
+There is currently a public running instance of Playlistlog on https://playlistlog.vorce.se but it should be fairly easy to self host (see the Docker section).
+
 ## Workflow
 
 - Sign in to spotify
@@ -22,7 +24,7 @@ Docker images are published to: https://hub.docker.com/r/vorce/playlistlog
 
 Example run:
 ```bash
-docker run --name playlistlog -d -p 4000:4000 -e SECRET_KEY_BASE=... -e SPOTIFY_CLIENT_ID=... -e SPOTIFY_CLIENT_SECRET=... -e SPOTIFY_REDIRECT_URI=http://localhost:4000/spotify_callback vorce/playlistlog:latest /app/bin/playlist_log start
+docker run --name playlistlog -d -p 4000:4000 -e SECRET_KEY_BASE=... -e SPOTIFY_CLIENT_ID=... -e SPOTIFY_CLIENT_SECRET=... -e SPOTIFY_REDIRECT_URI=http://localhost:4000/spotify_callback -v /var/run/docker.sock:/var/run/docker.sock vorce/playlistlog:latest /app/bin/playlist_log start
 ```
 
 ## Data export + import

@@ -1,24 +1,19 @@
 defmodule PlaylistLog.Dockerhub do
   @moduledoc """
-  Logic for reacting to webhook requests from dockerhub.
+  Logic for reacting to webhook requests from dockerhub. Interacts with the Docker API
+  using the docker unix socket. (which is expected to be at /var/run/docker.sock)
+
+  Example curls
+  - list running containers: `curl -XGET --unix-socket /var/run/docker.sock http://containers/json`
+  - list all services: `curl -XGET --unix-socket /var/run/docker.sock http://services`
   """
 
   require Logger
 
-  @doc """
-  Update a service
-
-  POST /services/(id)/update
-
-  Update a service. https://docs.docker.com/engine/api/v1.40/#operation/ServiceUpdate
-
-  Example curls
-  - list running containers: `curl -XGET --unix-socket /var/run/docker.sock http://localhost/containers/json`
-  - list all services: `curl -XGET --unix-socket /var/run/docker.sock http://localhost/services`
-  """
-
   @docker_socket "/var/run/docker.sock"
   @socket_path URI.encode_www_form(@docker_socket)
+  @protocol "http+unix://"
+  @base_url @protocol <> @socket_path
 
   def update_image("latest") do
     Logger.info("Ignoring dockerhub webhook request for tag 'latest'")
@@ -36,9 +31,13 @@ defmodule PlaylistLog.Dockerhub do
     end
   end
 
-  @protocol "http+unix://"
+  @doc """
+  Gets the service details for playlistlog
+
+  Docker API: https://docs.docker.com/engine/api/v1.40/#operation/ServiceList
+  """
   def get_service_details() do
-    url = @protocol <> @socket_path <> "/services"
+    url = @base_url <> "/services"
 
     with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(url),
          {:ok, services} <- Jason.decode(body),
@@ -57,8 +56,15 @@ defmodule PlaylistLog.Dockerhub do
     end)
   end
 
+  @doc """
+  Update a service
+
+  POST /services/(id)/update
+
+  Docker API docs: https://docs.docker.com/engine/api/v1.40/#operation/ServiceUpdate
+  """
   def update_service(id, version, tag) do
-    url = @protocol <> @socket_path <> "/services/#{id}/update?version=#{version}"
+    url = @base_url <> "/services/#{id}/update?version=#{version}"
     headers = ["content-type": "application/json"]
     payload = update_payload(tag)
     details = [url: url, id: id, version: version, tag: tag, payload: payload]
