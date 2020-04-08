@@ -8,7 +8,7 @@ defmodule PlaylistLog.Playlists.Event do
   alias PlaylistLog.Playlists.Track
 
   @track_added "TRACK_ADDED"
-  @track_removed "TRACK_REMOVED"
+  # @track_removed "TRACK_REMOVED"
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
