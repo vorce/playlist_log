@@ -80,9 +80,11 @@ defmodule PlaylistLog.Dockerhub do
   end
 
   defp update_payload(service, tag) do
+    service_spec = Map.fetch!(service, "Spec")
+
     put_in(
-      service,
-      ["Spec", "TaskTemplate", "ContainerSpec", "Image"],
+      service_spec,
+      ["TaskTemplate", "ContainerSpec", "Image"],
       "vorce/playlistlog:#{tag}"
     )
   end

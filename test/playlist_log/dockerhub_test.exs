@@ -212,7 +212,7 @@ defmodule PlaylistLog.DockerhubTest do
 
         {:ok, body, conn} = Plug.Conn.read_body(conn)
         payload = Jason.decode!(body)
-        image = get_in(payload, ["Spec", "TaskTemplate", "ContainerSpec", "Image"])
+        image = get_in(payload, ["TaskTemplate", "ContainerSpec", "Image"])
 
         assert image == "vorce/playlistlog:#{new_tag}"
 
