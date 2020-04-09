@@ -201,18 +201,26 @@ defmodule PlaylistLog.DockerhubTest do
 
   describe "update_service/4" do
     test "posts payload to docker API", %{bypass: bypass} do
-      id = "id1"
-      version = "version1"
+      id = "3th47x8a8fouz13vl169pbsfw"
+      version = 565
+      new_tag = "tag1"
       base_url = "http://localhost:#{bypass.port}"
 
       Bypass.expect_once(bypass, fn conn ->
         assert conn.request_path == "/services/#{id}/update"
         assert conn.query_string == "version=#{version}"
-        # check body payload?
+
+        {:ok, body, conn} = Plug.Conn.read_body(conn)
+        payload = Jason.decode!(body)
+        image = get_in(payload, ["Spec", "TaskTemplate", "ContainerSpec", "Image"])
+
+        assert image == "vorce/playlistlog:#{new_tag}"
+
         Plug.Conn.resp(conn, 200, "OK")
       end)
 
-      assert Dockerhub.update_service(id, version, "tag1", base_url) == :ok
+      service = @example_services |> Jason.decode!() |> hd()
+      assert Dockerhub.update_service(service, new_tag, base_url) == :ok
     end
   end
 end

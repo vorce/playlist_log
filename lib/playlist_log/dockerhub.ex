@@ -21,8 +21,8 @@ defmodule PlaylistLog.Dockerhub do
   end
 
   def update_image(tag) do
-    with {:ok, id, version} <- get_service_details(),
-         :ok <- update_service(id, version, tag) do
+    with {:ok, service} <- get_service_details(),
+         :ok <- update_service(service, tag) do
       :ok
     else
       error ->
@@ -40,9 +40,8 @@ defmodule PlaylistLog.Dockerhub do
     url = @base_url <> "/services"
 
     with {:ok, %HTTPoison.Response{status_code: 200, body: body}} <- HTTPoison.get(url),
-         {:ok, services} <- Jason.decode(body),
-         {:ok, service} <- find_service_details(services) do
-      {:ok, Map.get(service, "ID"), get_in(service, ["Version", "Index"])}
+         {:ok, services} <- Jason.decode(body) do
+      find_service_details(services)
     else
       unexpected -> {:error, :get_service_details, unexpected}
     end
@@ -63,10 +62,12 @@ defmodule PlaylistLog.Dockerhub do
 
   Docker API docs: https://docs.docker.com/engine/api/v1.40/#operation/ServiceUpdate
   """
-  def update_service(id, version, tag, base_url \\ @base_url) do
+  def update_service(service, tag, base_url \\ @base_url) do
+    id = Map.get(service, "ID")
+    version = get_in(service, ["Version", "Index"])
     url = base_url <> "/services/#{id}/update?version=#{version}"
     headers = ["content-type": "application/json"]
-    payload = update_payload(tag)
+    payload = update_payload(service, tag)
     details = [url: url, id: id, version: version, tag: tag, payload: payload]
 
     case HTTPoison.post(url, Jason.encode!(payload), headers) do
@@ -78,17 +79,11 @@ defmodule PlaylistLog.Dockerhub do
     end
   end
 
-  defp update_payload(tag) do
-    %{
-      "Name" => "playlistlog",
-      "TaskTemplate" => %{
-        "ContainerSpec" => %{
-          "Image" => "vorce/playlistlog:#{tag}"
-        }
-      },
-      "UpdateConfig" => %{
-        "Order" => "start-first"
-      }
-    }
+  defp update_payload(service, tag) do
+    put_in(
+      service,
+      ["Spec", "TaskTemplate", "ContainerSpec", "Image"],
+      "vorce/playlistlog:#{tag}"
+    )
   end
 end
