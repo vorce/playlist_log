@@ -68,7 +68,7 @@ defmodule PlaylistLog.Dockerhub do
     url = base_url <> "/services/#{id}/update?version=#{version}"
     headers = ["content-type": "application/json"]
     payload = update_payload(service, tag)
-    details = [url: url, id: id, version: version, tag: tag, payload: payload]
+    details = [url: url, id: id, version: version, tag: tag, payload: filtered(payload)]
 
     case HTTPoison.post(url, Jason.encode!(payload), headers) do
       {:ok, %HTTPoison.Response{status_code: 200}} ->
@@ -87,5 +87,9 @@ defmodule PlaylistLog.Dockerhub do
       ["TaskTemplate", "ContainerSpec", "Image"],
       "vorce/playlistlog:#{tag}"
     )
+  end
+
+  defp filtered(payload) do
+    put_in(payload, ["TaskTemplate", "ContainerSpec", "Env"], ["***filtered***"])
   end
 end
