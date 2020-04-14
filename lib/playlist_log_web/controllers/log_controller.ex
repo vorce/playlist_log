@@ -50,7 +50,8 @@ defmodule PlaylistLogWeb.LogController do
       render(conn, "show.html",
         log: log,
         ordered_tracks: ordered_tracks,
-        show_events: show_events
+        show_events: show_events,
+        subtitle: log.name
       )
     else
       {:error, reason} ->
