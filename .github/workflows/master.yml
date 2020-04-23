@@ -1,6 +1,9 @@
-name: Elixir CI/CD
+name: Elixir CI/CD for master
 
-on: push
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -30,7 +33,3 @@ jobs:
         image_tag: latest,${{ github.sha }}
         push_git_tag: true
         build_extra_args: "--build-arg=SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}"
-      on:
-        push:
-          branches:
-            - master
