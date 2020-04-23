@@ -1,6 +1,9 @@
-name: Elixir CI/CD
+name: Elixir CI/CD for master
 
-on: push
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
