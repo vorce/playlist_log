@@ -22,7 +22,8 @@
 </fieldset>
 </form>
 
-
+<div id="events" phx-update="replace">
 <%= for {date, events} <- @ordered_events do
     render("date_events.html", date: date, events: events)
 end %>
+</div>

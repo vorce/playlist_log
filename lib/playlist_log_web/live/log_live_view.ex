@@ -19,7 +19,7 @@ defmodule PlaylistLogWeb.LogLiveView do
       ordered_events: Event.filtered_events(events, show_events)
     ]
 
-    {:ok, assign(socket, assigns)}
+    {:ok, assign(socket, assigns), temporary_assigns: [ordered_events: []]}
   end
 
   def handle_event("event_filter_change", %{"show_events" => show_events}, socket) do
