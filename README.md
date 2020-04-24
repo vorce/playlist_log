@@ -1,3 +1,5 @@
+![Elixir CI/CD for master](https://github.com/vorce/playlist_log/workflows/Elixir%20CI/CD%20for%20master/badge.svg?branch=master)
+
 # Playlistlog
 
 Playlistlog is a tool to manage your Spotify playlists with.
