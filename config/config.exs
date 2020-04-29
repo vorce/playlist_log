@@ -12,7 +12,7 @@ config :playlist_log, PlaylistLogWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "pzeDB0c+6lv7SPX+nT1orYlOSTMHKnjgaPRSf7TQ8Rs3pMtVCKUmi1o+LMLl/exB",
   render_errors: [view: PlaylistLogWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: PlaylistLog.PubSub, adapter: Phoenix.PubSub.PG2],
+  pubsub_server: PlaylistLog.PubSub,
   live_view: [
     signing_salt: "JNvyNg8AHcWKr4uvWuCea8IrVH0gmQhS"
   ]
