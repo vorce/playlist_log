@@ -205,7 +205,8 @@ defmodule PlaylistLog.Playlists do
        %{
          artist: Track.artist_string(raw_track),
          name: raw_track["name"],
-         uri: track_uri
+         uri: track_uri,
+         snapshot_id: new_snapshot_id
        }}
     end
   end

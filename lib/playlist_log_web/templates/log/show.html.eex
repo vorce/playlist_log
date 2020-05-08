@@ -19,7 +19,7 @@
             <%= text_input f, :uri, value: "", placeholder: "spotify:track:2oi3gjrmsdb8GpcgtH9Mn6" %>
             <%= submit "Add track", method: :post %>
             <div class="float-right">
-              <%= checkbox f, :delete_oldest, value: "false" %> <%= label f, :delete_oldest, "Delete oldest track afterwards", class: "label-inline" %>
+              <%= checkbox f, :remove_oldest, value: "false" %> <%= label f, :remove_oldest, "Remove oldest track afterwards", class: "label-inline" %>
             </div>
           </fieldset>
         <% end %>
