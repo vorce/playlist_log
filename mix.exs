@@ -51,7 +51,8 @@ defmodule PlaylistLog.MixProject do
       {:con_cache, "~> 0.14"},
       {:bypass, "~> 1.0", only: :test},
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
-      {:sobelow, "~> 0.10", only: :dev, runtime: false}
+      {:sobelow, "~> 0.10", only: :dev, runtime: false},
+      {:mock, "~> 0.3", only: :test}
     ]
   end
 end

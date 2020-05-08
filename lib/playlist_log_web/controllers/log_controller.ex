@@ -2,6 +2,8 @@ defmodule PlaylistLogWeb.LogController do
   use PlaylistLogWeb, :controller
   plug PlaylistLogWeb.Plugs.SpotifyAuth
 
+  require Logger
+
   alias PlaylistLog.Playlists
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
@@ -97,15 +99,39 @@ defmodule PlaylistLogWeb.LogController do
     end
   end
 
-  def add_track(conn, %{"log_id" => log_id, "track" => %{"uri" => track_uri}}) do
+  def add_track(conn, %{"log_id" => log_id, "track" => %{"uri" => track_uri}} = params) do
+    remove_oldest? = get_in(params, ["track", "remove_oldest"])
     spotify_user = get_session(conn, :spotify_user)
     spotify_access_token = conn.cookies["spotify_access_token"]
 
     with {:ok, log} <- Playlists.get_log(spotify_user, log_id, spotify_access_token),
-         {:ok, track} <- Playlists.add_track(log, track_uri, spotify_access_token) do
+         {:ok, track} <- Playlists.add_track(log, track_uri, spotify_access_token),
+         {:remove, {:ok, _}} <-
+           maybe_remove_oldest(
+             remove_oldest?,
+             spotify_user,
+             log,
+             track.snapshot_id,
+             spotify_access_token
+           ) do
       conn
       |> put_flash(:info, "#{track.artist} - #{track.name} added successfully")
       |> redirect(to: Routes.log_path(conn, :show, log.id))
+    else
+      {:remove, unexpected} ->
+        Logger.error("Failed to remove the oldest added track, reason: #{inspect(unexpected)}")
+
+        conn
+        |> put_flash(:error, "Unable to remove the oldest track")
+        |> redirect(to: Routes.log_path(conn, :show, log_id))
     end
+  end
+
+  defp maybe_remove_oldest("false", _, _, _, _) do
+    {:remove, {:ok, %{}}}
+  end
+
+  defp maybe_remove_oldest("true", spotify_user, log, snapshot_id, access_token) do
+    {:remove, Playlists.remove_oldest_track(spotify_user, log, snapshot_id, access_token)}
   end
 end

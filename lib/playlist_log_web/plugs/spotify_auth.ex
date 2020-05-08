@@ -23,7 +23,9 @@ defmodule PlaylistLogWeb.Plugs.SpotifyAuth do
   I am sort of re-implementing Spotify.Authentication.refresh here
   because I want to lower the max_age of the spotify cookies.
   """
-  def refresh(%Plug.Conn{} = conn) do
+  def refresh(%Plug.Conn{assigns: %{spotify: :no_refresh}} = conn), do: {:ok, conn}
+
+  def refresh(%Plug.Conn{assigns: %{}} = conn) do
     with {:ok, auth} <- conn |> Spotify.Credentials.new() |> refresh do
       {:ok, set_cookies(conn, auth)}
     end
