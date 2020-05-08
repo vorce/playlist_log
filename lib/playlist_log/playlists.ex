@@ -148,6 +148,22 @@ defmodule PlaylistLog.Playlists do
   end
 
   @doc """
+  Removes the oldest added track from the playlist
+  """
+  def remove_oldest_track(user, log, snapshot_id, access_token) do
+    oldest_track = Enum.min_by(log.tracks, fn track -> DateTime.to_unix(track.added_at) end)
+
+    details = [
+      track: "#{Track.artist_string(oldest_track)} - #{oldest_track.name}",
+      uri: oldest_track.uri
+    ]
+
+    Logger.info("Removing oldest track from playlist #{log.id}: #{inspect(details)}")
+
+    delete_tracks(user, log.id, snapshot_id, [oldest_track.uri], access_token)
+  end
+
+  @doc """
   Delete a track from a spotify playlist (and its log)
   """
   def delete_tracks(user, log_id, snapshot_id, track_uris, access_token) do

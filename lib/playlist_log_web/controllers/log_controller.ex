@@ -106,7 +106,7 @@ defmodule PlaylistLogWeb.LogController do
 
     with {:ok, log} <- Playlists.get_log(spotify_user, log_id, spotify_access_token),
          {:ok, track} <- Playlists.add_track(log, track_uri, spotify_access_token),
-         :ok <-
+         {:remove, {:ok, _}} <-
            maybe_remove_oldest(
              remove_oldest?,
              spotify_user,
@@ -117,24 +117,21 @@ defmodule PlaylistLogWeb.LogController do
       conn
       |> put_flash(:info, "#{track.artist} - #{track.name} added successfully")
       |> redirect(to: Routes.log_path(conn, :show, log.id))
+    else
+      {:remove, unexpected} ->
+        Logger.error("Failed to remove the oldest added track, reason: #{inspect(unexpected)}")
+
+        conn
+        |> put_flash(:error, "Unable to remove the oldest track")
+        |> redirect(to: Routes.log_path(conn, :show, log_id))
     end
   end
 
   defp maybe_remove_oldest("false", _, _, _, _) do
-    :ok
+    {:remove, {:ok, %{}}}
   end
 
   defp maybe_remove_oldest("true", spotify_user, log, snapshot_id, access_token) do
-    oldest_track = Enum.min_by(log.tracks, fn track -> DateTime.to_unix(track.added_at) end)
-
-    details = [
-      track: "#{Track.artist_string(oldest_track)} - #{oldest_track.name}",
-      uri: oldest_track.uri
-    ]
-
-    Logger.info("Removing oldest track from playlist #{log.id}: #{inspect(details)}")
-
-    Playlists.delete_tracks(spotify_user, log.id, snapshot_id, [oldest_track.uri], access_token)
-    :ok
+    {:remove, Playlists.remove_oldest_track(spotify_user, log, snapshot_id, access_token)}
   end
 end
