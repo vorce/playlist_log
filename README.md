@@ -66,8 +66,8 @@ https://hexdocs.pm/cubdb/howto.html
 
 ```elixir
 %{
-  {:log, <user-id>, <log-id>} => %Log{}
-  {:event, <log-id>, <date-string>} => [%Event{}, %Event{}]
+  {:log, <user-id>, <log-id>} => %{}
+  {:event, <log-id>, <date-string>} => [%{}, %{}]
 }
 ```
 
