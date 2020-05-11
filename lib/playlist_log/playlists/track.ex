@@ -48,8 +48,8 @@ defmodule PlaylistLog.Playlists.Track do
     }
   end
 
-  def artist_string(%__MODULE__{} = track) do
-    artist_string(%{"artists" => track.artists})
+  def artist_string(%{artists: artists}) do
+    artist_string(%{"artists" => artists})
   end
 
   def artist_string(%{"artists" => nil}), do: ""

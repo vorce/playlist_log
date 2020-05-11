@@ -94,7 +94,7 @@ defmodule PlaylistLog.Repo do
   end
 
   defp do_update(Log, log) do
-    insert(Log, log.owner_id, [log])
+    insert(Log, log.owner_id, [%{log | tracks: []}])
   end
 
   def select_keys(Event, log_id) do
