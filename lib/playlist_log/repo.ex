@@ -20,13 +20,6 @@ defmodule PlaylistLog.Repo do
     end
   end
 
-  defp to_struct(Log = _module, %Log{} = result), do: result
-  defp to_struct(Event = _module, %Event{} = result), do: result
-
-  defp to_struct(module, %{} = result) do
-    struct(module, result)
-  end
-
   def all(Log = module, id) do
     with {:ok, results} <- CubDB.select(@cubdb, select_keys(module, id)) do
       {:ok, Enum.map(results, fn {_key, match} -> to_struct(module, match) end)}
@@ -40,6 +33,13 @@ defmodule PlaylistLog.Repo do
 
       {:ok, result}
     end
+  end
+
+  defp to_struct(Log = _module, %Log{} = result), do: result
+  defp to_struct(Event = _module, %Event{} = result), do: result
+
+  defp to_struct(module, %{} = result) do
+    struct(module, result)
   end
 
   def update(Log = module, user_id, logs, update_fn) when is_list(logs) do
