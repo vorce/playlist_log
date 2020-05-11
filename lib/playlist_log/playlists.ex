@@ -76,6 +76,7 @@ defmodule PlaylistLog.Playlists do
          :ok <-
            Repo.update(
              Log.changeset(%Log{log | events: unique_events}, %{
+               tracks: tracks,
                event_count: length(unique_events)
              })
            ) do

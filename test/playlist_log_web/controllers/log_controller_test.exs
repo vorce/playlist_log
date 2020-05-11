@@ -7,6 +7,20 @@ defmodule PlaylistLogWeb.LogControllerTest do
   alias PlaylistLog.Playlists.Track
   alias PlaylistLog.Repo
 
+  setup_all do
+    path = Application.get_env(:playlist_log, PlaylistLog.Repo)[:data_dir]
+
+    with {:ok, files} <- File.ls(path) do
+      Enum.each(files, fn file ->
+        full_path = Path.join(path, file)
+        IO.puts("Deleting file: #{full_path}")
+        File.rm(full_path)
+      end)
+    end
+
+    :ok
+  end
+
   describe "add_track/2" do
     test "remove_oldest", %{conn: conn} do
       log_id = "test-remove-oldest-track"

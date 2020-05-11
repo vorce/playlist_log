@@ -35,14 +35,19 @@ defmodule PlaylistLog.Repo do
     end
   end
 
-  defp to_struct(Log = _module, %Log{} = result), do: result
-  defp to_struct(Event = _module, %Event{} = result), do: result
+  defp to_struct(Log = _module, %Log{} = struct), do: struct
+  defp to_struct(Event = _module, %Event{} = struct), do: struct
+
+  defp to_struct(Log = _module, %{tracks: tracks} = map) when is_list(tracks) do
+    s = struct(Log, map)
+    %Log{s | tracks: Enum.map(s.tracks, &to_struct(PlaylistLog.Playlists.Track, &1))}
+  end
 
   defp to_struct(module, %{} = result) do
     struct(module, result)
   end
 
-  defp to_map(%Log{} = log) do
+  defp to_map(%Log{tracks: tracks} = log) when is_list(tracks) do
     %{Map.from_struct(log) | tracks: Enum.map(log.tracks, &to_map/1)}
   end
 
@@ -57,7 +62,9 @@ defmodule PlaylistLog.Repo do
   end
 
   def insert(Log = module, user_id, logs) do
-    Enum.each(logs, fn log -> CubDB.put(@cubdb, key(module, {user_id, log.id}), to_map(log)) end)
+    Enum.each(logs, fn log ->
+      CubDB.put(@cubdb, key(module, {user_id, log.id}), to_map(log))
+    end)
   end
 
   def insert(Event = module, log_id, %Ecto.Changeset{valid?: true} = changeset) do
@@ -94,7 +101,7 @@ defmodule PlaylistLog.Repo do
   end
 
   defp do_update(Log, log) do
-    insert(Log, log.owner_id, [%{log | tracks: []}])
+    insert(Log, log.owner_id, [log])
   end
 
   def select_keys(Event, log_id) do
@@ -105,7 +112,7 @@ defmodule PlaylistLog.Repo do
 
   def select_keys(Log, user_id) do
     min_key = key(Log, {user_id, nil})
-    max_key = key(Log, {user_id, "ZZZZZZZZZZZZZZZZZZZZZZ"})
+    max_key = key(Log, {user_id, "zzzzzzzzzzzzzzzzzzzzzz"})
     [min_key: min_key, max_key: max_key]
   end
 
