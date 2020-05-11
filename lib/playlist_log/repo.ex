@@ -11,13 +11,19 @@ defmodule PlaylistLog.Repo do
   @cubdb :cubdb
 
   def get(Log = module, id) do
-    with %Log{} = log <- CubDB.get(@cubdb, key(module, id), :no_such_log),
+    with %{} = log <- CubDB.get(@cubdb, key(module, id), :no_such_log),
          {:ok, events} <- all(Event, log.id) do
       Logger.debug("Fetched events for log: #{length(events)}")
-      {:ok, %Log{log | events: events, event_count: length(events)}}
+      {:ok, %Log{to_struct(module, log) | events: events, event_count: length(events)}}
     else
       :no_such_log -> {:error, {:no_such_resource, id}}
     end
+  end
+
+  defp to_struct(Log = _module, %Log{} = result), do: result
+
+  defp to_struct(Log = module, %{} = result) do
+    struct(module, result)
   end
 
   def all(Log = module, id) do
