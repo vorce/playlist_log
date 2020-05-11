@@ -29,7 +29,7 @@ defmodule PlaylistLog.Repo do
 
   def all(Log = module, id) do
     with {:ok, results} <- CubDB.select(@cubdb, select_keys(module, id)) do
-      {:ok, Enum.map(results, fn {_key, match} -> match end)}
+      {:ok, Enum.map(results, fn {_key, match} -> to_struct(module, match) end)}
     end
   end
 
