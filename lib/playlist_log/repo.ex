@@ -42,6 +42,13 @@ defmodule PlaylistLog.Repo do
     struct(module, result)
   end
 
+  defp to_map(%Log{} = log) do
+    %{Map.from_struct(log) | tracks: Enum.map(log.tracks, &to_map/1)}
+  end
+
+  defp to_map(%{__struct__: _} = struct), do: Map.from_struct(struct)
+  defp to_map(map) when is_map(map), do: map
+
   def update(Log = module, user_id, logs, update_fn) when is_list(logs) do
     Enum.each(logs, fn log ->
       key = key(module, {user_id, log.id})
@@ -50,11 +57,15 @@ defmodule PlaylistLog.Repo do
   end
 
   def insert(Log = module, user_id, logs) do
-    Enum.each(logs, fn log -> CubDB.put(@cubdb, key(module, {user_id, log.id}), log) end)
+    Enum.each(logs, fn log -> CubDB.put(@cubdb, key(module, {user_id, log.id}), to_map(log)) end)
   end
 
   def insert(Event = module, log_id, %Ecto.Changeset{valid?: true} = changeset) do
-    event = Ecto.Changeset.apply_changes(changeset)
+    event =
+      changeset
+      |> Ecto.Changeset.apply_changes()
+      |> to_map()
+
     key = key(module, {log_id, DateTime.to_date(event.timestamp)})
     Logger.info("Adding event from changeset #{inspect(key: key, value: event)}")
 
@@ -65,6 +76,7 @@ defmodule PlaylistLog.Repo do
 
   def insert(Event = module, log_id, %Event{} = event) do
     key = key(module, {log_id, DateTime.to_date(event.timestamp)})
+    event = to_map(event)
     Logger.info("Adding event #{inspect(key: key, value: event)}")
 
     CubDB.update(@cubdb, key, [event], fn existing ->
