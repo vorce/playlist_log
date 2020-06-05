@@ -55,8 +55,24 @@ defmodule PlaylistLog.Playlists.Event do
     |> Enum.sort(&latest_first_order/2)
   end
 
-  defp latest_first_order({date1, _}, {date2, _}) do
+  def latest_first_order(%__MODULE__{timestamp: timestamp1}, %__MODULE__{timestamp: timestamp2}) do
+    latest_first_order(timestamp1, timestamp2)
+  end
+
+  def latest_first_order({%Date{} = date1, _}, {%Date{} = date2, _}) do
+    latest_first_order(date1, date2)
+  end
+
+  def latest_first_order(%Date{} = date1, %Date{} = date2) do
     case Date.compare(date1, date2) do
+      :lt -> false
+      :gt -> true
+      _ -> true
+    end
+  end
+
+  def latest_first_order(%DateTime{} = datetime1, %DateTime{} = datetime2) do
+    case DateTime.compare(datetime1, datetime2) do
       :lt -> false
       :gt -> true
       _ -> true
