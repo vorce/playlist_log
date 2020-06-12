@@ -17,7 +17,7 @@ defmodule PlaylistLogWeb.Endpoint do
     at: "/",
     from: :playlist_log,
     gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ~w(css fonts images js favicon.ico favicon.svg robots.txt)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
