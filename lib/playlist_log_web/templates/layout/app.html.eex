@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>PlaylistLog<%= render_subtitle(@conn) %></title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <link rel="icon" type="image/svg+xml" href="<%= Routes.static_path(@conn, "/favicon.svg") %>">
+    <link rel="icon" type="image/svg+xml" href="<%= Routes.static_path(@conn, "/images/favicon.svg") %>">
     <link rel="alternate icon" href="<%= Routes.static_path(@conn, "/favicon.ico") %>">
   </head>
   <body>
