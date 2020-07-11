@@ -1,9 +1,12 @@
 defmodule PlaylistLog.PlaylistsTest do
   use ExUnit.Case
   alias PlaylistLog.Playlists
+  alias PlaylistLog.Playlists.Event
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
   alias PlaylistLog.Test.SpotifyStubClient
+
+  @user_id "user_1"
 
   describe "list_playlists/2" do
     test "returns list of playlists from music platform" do
@@ -45,6 +48,11 @@ defmodule PlaylistLog.PlaylistsTest do
   end
 
   describe "get_log/3" do
+    setup do
+      PlaylistLog.Repo.delete(Log, {@user_id, "many-events"})
+      :ok
+    end
+
     test "returns an error tuple if log does not exist" do
       user = %{"id" => "user"}
 
@@ -53,13 +61,30 @@ defmodule PlaylistLog.PlaylistsTest do
     end
 
     test "return log" do
-      user_id = "user_1"
-      user = %{"id" => user_id}
-      expected = [%Log{log("1", user_id) | events: [], track_count: 0}]
-      PlaylistLog.Repo.insert(Log, user_id, expected)
+      user = %{"id" => @user_id}
+      expected = [%Log{log("1", @user_id) | events: [], track_count: 0}]
+      PlaylistLog.Repo.insert(Log, @user_id, expected)
 
       assert {:ok, %PlaylistLog.Playlists.Log{track_count: 2, event_count: 2}} =
                Playlists.get_log(user, "1", "token")
+    end
+
+    test "returns only the first 30 events from storage" do
+      log_id = "many-events"
+      user = %{"id" => @user_id}
+      # this comes from the mocked playlist
+      events_from_spotify = 2
+      events_from_storage = 30
+      events_in_storage = 0..100 |> Enum.map(&event(&1, log_id))
+
+      Enum.each(events_in_storage, &PlaylistLog.Repo.insert(Event, log_id, &1))
+
+      expected = [%Log{log(log_id, @user_id) | events: events_in_storage, track_count: 0}]
+      PlaylistLog.Repo.insert(Log, @user_id, expected)
+
+      {:ok, log} = Playlists.get_log(user, log_id, "token", max_events: events_from_storage)
+
+      assert length(log.events) == events_from_storage + events_from_spotify
     end
   end
 
@@ -125,5 +150,18 @@ defmodule PlaylistLog.PlaylistsTest do
 
   defp track(uri, name) do
     %Track{uri: uri, name: name, artists: [%{"name" => "artist_#{name}"}]}
+  end
+
+  defp event(id, log_id) do
+    %Event{
+      id: id,
+      timestamp: DateTime.utc_now(),
+      type: "TRACK_ADDED",
+      user: id,
+      log_id: log_id,
+      track_uri: id,
+      track_name: id,
+      track_artist: id
+    }
   end
 end
