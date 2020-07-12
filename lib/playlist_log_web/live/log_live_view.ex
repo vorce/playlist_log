@@ -47,21 +47,22 @@ defmodule PlaylistLogWeb.LogLiveView do
     Logger.debug("Loading #{@more_events_increment} more events for log #{log_id} ...")
     events_to_show = socket.assigns[:events_to_show] + @more_events_increment
 
-    with {:ok, events} <- PlaylistLog.Repo.all(Event, log_id, max_events: events_to_show) do
-      filtered_events =
-        limited_filtered_events(
-          events,
-          socket.assigns[:show_events],
-          events_to_show
-        )
+    case PlaylistLog.Repo.all(Event, log_id, max_events: events_to_show) do
+      {:ok, events} ->
+        filtered_events =
+          limited_filtered_events(
+            events,
+            socket.assigns[:show_events],
+            events_to_show
+          )
 
-      {:noreply,
-       assign(socket,
-         events: events,
-         events_to_show: events_to_show,
-         ordered_events: filtered_events
-       )}
-    else
+        {:noreply,
+         assign(socket,
+           events: events,
+           events_to_show: events_to_show,
+           ordered_events: filtered_events
+         )}
+
       unexpected ->
         Logger.error(
           "Unexpected response when loading events for log #{log_id}: #{inspect(unexpected)}"
