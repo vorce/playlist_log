@@ -74,7 +74,6 @@ defmodule PlaylistLogWeb.LogLiveView do
   defp limited_filtered_events(events, filter, limit) do
     events
     |> Enum.sort(&Event.latest_first_order/2)
-    |> IO.inspect(label: "sorted #{length(events)} events")
     |> Enum.take(limit)
     |> Event.filtered_events(filter)
   end
