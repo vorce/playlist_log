@@ -46,8 +46,10 @@ defmodule PlaylistLogWeb.LogController do
     show_events = Map.get(params, "show_events", "all")
     spotify_user = get_session(conn, :spotify_user)
     spotify_access_token = conn.cookies["spotify_access_token"]
+    event_count = Map.get(params, "max_events", 30)
+    opts = [max_events: event_count]
 
-    with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token),
+    with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token, opts),
          ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2) do
       render(conn, "show.html",
         log: log,

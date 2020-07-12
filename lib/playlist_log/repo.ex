@@ -10,9 +10,9 @@ defmodule PlaylistLog.Repo do
   @early_date ~D[1985-03-13]
   @cubdb :cubdb
 
-  def get(Log = module, id) do
+  def get(Log = module, id, opts \\ []) do
     with %{} = log <- CubDB.get(@cubdb, key(module, id), :no_such_log),
-         {:ok, events} <- all(Event, log.id) do
+         {:ok, events} <- all(Event, log.id, opts) do
       Logger.debug("Fetched events for log: #{length(events)}")
       {:ok, %Log{to_struct(module, log) | events: events, event_count: length(events)}}
     else
@@ -20,16 +20,27 @@ defmodule PlaylistLog.Repo do
     end
   end
 
-  def all(Log = module, id) do
-    with {:ok, results} <- CubDB.select(@cubdb, select_keys(module, id)) do
+  def all(module, id, opts \\ [])
+
+  def all(Log = module, id, opts) do
+    cubdb_opts = Keyword.merge(select_keys(module, id), opts)
+
+    with {:ok, results} <- CubDB.select(@cubdb, cubdb_opts) do
       {:ok, Enum.map(results, fn {_key, match} -> to_struct(module, match) end)}
     end
   end
 
-  def all(Event = module, id) do
-    with {:ok, matches} <- CubDB.select(@cubdb, select_keys(module, id)) do
+  def all(Event = module, id, opts) do
+    default_opts = select_keys(module, id) ++ [reverse: true]
+    cubdb_opts = Keyword.merge(default_opts, Keyword.get(opts, :cubdb, []))
+
+    max_events = Keyword.get(opts, :max_events, 30)
+
+    with {:ok, matches} <- CubDB.select(@cubdb, cubdb_opts) do
       result =
-        Enum.flat_map(matches, fn {_k, events} -> Enum.map(events, &to_struct(module, &1)) end)
+        matches
+        |> Enum.flat_map(fn {_k, events} -> Enum.map(events, &to_struct(module, &1)) end)
+        |> Enum.take(max_events)
 
       {:ok, result}
     end
@@ -118,4 +129,23 @@ defmodule PlaylistLog.Repo do
 
   def key(Log, {user_id, log_id}), do: {:log, user_id, log_id}
   def key(Event, {log_id, date}), do: {:event, log_id, Date.to_iso8601(date, :basic)}
+
+  def delete(Log, {user_id, log_id}) do
+    with {:ok, log} <- get(Log, {user_id, log_id}) do
+      Logger.info("Deleting log with id #{log_id} and all of its #{length(log.events)} events")
+
+      log.events
+      |> all_event_keys(log_id)
+      |> Enum.each(&CubDB.delete(@cubdb, &1))
+
+      CubDB.delete(@cubdb, log_id)
+    end
+  end
+
+  defp all_event_keys(events, log_id) do
+    events
+    |> Enum.group_by(fn event -> DateTime.to_date(event.timestamp) end)
+    |> Map.keys()
+    |> Enum.map(&key(Event, {log_id, &1}))
+  end
 end

@@ -9,6 +9,8 @@ config :playlist_log, PlaylistLogWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-config :playlist_log, PlaylistLog.Repo, data_dir: "priv/cubdb_test"
+config :playlist_log, PlaylistLog.Repo,
+  data_dir: "priv/cubdb_test",
+  auto_compact: false
 
 config :playlist_log, PlaylistLog.Playlists, spotify_client: PlaylistLog.Test.SpotifyStubClient

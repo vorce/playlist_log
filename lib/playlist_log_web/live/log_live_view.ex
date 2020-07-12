@@ -15,11 +15,13 @@ defmodule PlaylistLogWeb.LogLiveView do
   def mount(_params, session, socket) do
     events = Map.fetch!(session, "events")
     show_events = Map.fetch!(session, "show_events")
+    log_id = Map.fetch!(session, "log_id")
     events_to_show = @initial_event_count
 
     assigns = [
       events_to_show: events_to_show,
       events: events,
+      log_id: log_id,
       show_events: show_events,
       ordered_events: limited_filtered_events(events, show_events, events_to_show)
     ]
@@ -41,17 +43,33 @@ defmodule PlaylistLogWeb.LogLiveView do
   end
 
   def handle_event("show_more_events", _, socket) do
-    Logger.debug("Loading #{@more_events_increment} more events...")
+    log_id = socket.assigns[:log_id]
+    Logger.debug("Loading #{@more_events_increment} more events for log #{log_id} ...")
     events_to_show = socket.assigns[:events_to_show] + @more_events_increment
 
-    filtered_events =
-      limited_filtered_events(
-        socket.assigns[:events],
-        socket.assigns[:show_events],
-        events_to_show
-      )
+    case PlaylistLog.Repo.all(Event, log_id, max_events: events_to_show) do
+      {:ok, events} ->
+        filtered_events =
+          limited_filtered_events(
+            events,
+            socket.assigns[:show_events],
+            events_to_show
+          )
 
-    {:noreply, assign(socket, events_to_show: events_to_show, ordered_events: filtered_events)}
+        {:noreply,
+         assign(socket,
+           events: events,
+           events_to_show: events_to_show,
+           ordered_events: filtered_events
+         )}
+
+      unexpected ->
+        Logger.error(
+          "Unexpected response when loading events for log #{log_id}: #{inspect(unexpected)}"
+        )
+
+        {:noreply, socket}
+    end
   end
 
   defp limited_filtered_events(events, filter, limit) do
