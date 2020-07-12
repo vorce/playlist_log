@@ -11,7 +11,11 @@ defmodule PlaylistLog.Application do
     children = [
       {ConCache,
        [name: :track_cache, ttl_check_interval: :timer.minutes(1), global_ttl: :timer.minutes(30)]},
-      CubDB.child_spec(data_dir: @cubdb_data_dir, auto_compact: true, name: :cubdb),
+      CubDB.child_spec(
+        data_dir: @cubdb_data_dir,
+        auto_compact: Application.get_env(:playlist_log, PlaylistLog.Repo)[:auto_compact],
+        name: :cubdb
+      ),
       {Phoenix.PubSub, name: PlaylistLog.PubSub},
       PlaylistLogWeb.Endpoint
     ]

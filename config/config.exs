@@ -18,7 +18,9 @@ config :playlist_log, PlaylistLogWeb.Endpoint,
   ]
 
 # Path.join(:code.priv_dir(:playlist_log), "cubdb")
-config :playlist_log, PlaylistLog.Repo, data_dir: "priv/cubdb"
+config :playlist_log, PlaylistLog.Repo,
+  data_dir: "priv/cubdb",
+  auto_compact: true
 
 config :playlist_log, PlaylistLog.Playlists, spotify_client: PlaylistLog.Spotify
 
