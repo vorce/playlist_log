@@ -69,8 +69,9 @@ defmodule PlaylistLog.Playlists do
   """
   def get_log(user, log_id, access_token, opts \\ []) do
     with {:ok, user_id} <- Map.fetch(user, "id"),
-         {:ok, log} <- Repo.get(Log, {user_id, log_id}, opts),
          {:ok, raw_tracks} <- spotify().get_playlist_tracks(access_token, log_id),
+         {:ok, log} <-
+           Repo.get(Log, {user_id, log_id}, Keyword.merge([max_events: length(raw_tracks)], opts)),
          tracks <- Enum.map(raw_tracks, &Track.new/1),
          {unique_events, missing_events} <- unique_events(log_id, tracks, log.events),
          :ok <-
