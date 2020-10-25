@@ -41,7 +41,7 @@ defmodule PlaylistLog.Playlists.Track do
       artists: get_in(raw_track, ["track", "artists"]),
       album: get_in(raw_track, ["track", "album"]),
       duration_ms: get_in(raw_track, ["track", "duration_ms"]),
-      id: get_in(raw_track, ["track", "id"]),
+      id: UUID.uuid1(),
       uri: get_in(raw_track, ["track", "uri"]),
       added_at: added_at,
       added_by: get_in(raw_track, ["added_by", "id"])
