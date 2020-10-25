@@ -107,6 +107,15 @@ defmodule PlaylistLog.Repo do
     do_update(new_struct.__struct__, new_struct)
   end
 
+  def update(%Ecto.Changeset{valid?: false} = changeset) do
+    changeset_tracks = Map.get(changeset.changes, :tracks, [])
+    invalid_tracks = Enum.reject(changeset_tracks, fn track_change -> track_change.valid? end)
+
+    details = [errors: changeset.errors, data: changeset.data, invalid_tracks: invalid_tracks]
+    Logger.error("Invalid changeset #{inspect(details)}")
+    {:error, :invalid_changeset}
+  end
+
   defp do_update(Event, event) do
     insert(Event, event.log_id, event)
   end
