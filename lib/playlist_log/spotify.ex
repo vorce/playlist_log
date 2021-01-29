@@ -147,6 +147,25 @@ defmodule PlaylistLog.Spotify do
     end)
   end
 
+  @doc """
+  Checks if a string is a valid spotify uri.
+
+  Example of valid uris:
+
+    spotify:album:27ftYHLeunzcSzb33Wk1hf
+    spotify:artist:3mvkWMe6swnknwscwvGCHO
+    spotify:track:7lEptt4wbM0yJTvSG5EBof
+  """
+  @impl PlaylistLog.MusicClient
+  def validate_uri(maybe_uri) do
+    case String.split(maybe_uri, ":", parts: 3) do
+      ["spotify", "track", _id] -> {:ok, :track}
+      ["spotify", "album", _id] -> {:ok, :album}
+      ["spotify", "artist", _id] -> {:ok, :artist}
+      _ -> {:error, :invalid_format}
+    end
+  end
+
   defp handle_unexpected_response(url, {:ok, %HTTPoison.Response{status_code: 429, body: body}}) do
     Logger.info("Hit spotify rate-limit (429) for #{url}")
     {:error, {__MODULE__, Jason.decode!(body)}}

@@ -212,6 +212,11 @@ defmodule PlaylistLog.Test.SpotifyStubClient do
     {:ok, String.reverse(playlist_id)}
   end
 
+  @impl PlaylistLog.MusicClient
+  def validate_uri(_uri) do
+    {:ok, :track}
+  end
+
   @get_track_response """
   {
     "album": {
