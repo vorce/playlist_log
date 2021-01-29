@@ -27,6 +27,7 @@ defmodule PlaylistLogWeb.LogController do
 
   def index(conn, _params) do
     spotify_user = get_session(conn, :spotify_user)
+
     # spotify_access_token = conn.cookies["spotify_access_token"]
 
     case Playlists.list_logs(spotify_user) do
@@ -123,6 +124,21 @@ defmodule PlaylistLogWeb.LogController do
 
         conn
         |> put_flash(:error, "Unable to remove the oldest track")
+        |> redirect(to: Routes.log_path(conn, :show, log_id))
+
+      {:ok, :album} ->
+        conn
+        |> put_flash(:error, "Can't add an album to the list")
+        |> redirect(to: Routes.log_path(conn, :show, log_id))
+
+      {:ok, :artist} ->
+        conn
+        |> put_flash(:error, "Can't add an artist to the list")
+        |> redirect(to: Routes.log_path(conn, :show, log_id))
+
+      {:error, :invalid_format} ->
+        conn
+        |> put_flash(:error, "Invalid spotify uri")
         |> redirect(to: Routes.log_path(conn, :show, log_id))
     end
   end

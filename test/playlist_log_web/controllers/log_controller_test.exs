@@ -36,7 +36,8 @@ defmodule PlaylistLogWeb.LogControllerTest do
         get_playlist_tracks: spotify_tracks(log.tracks),
         get_track: spotify_track(add_track_params["uri"]),
         add_tracks_to_playlist: fn _, _, _ -> {:ok, "snapshot2"} end,
-        delete_tracks_from_playlist: fn _, _, "snapshot2", _ -> {:ok, "snapshot3"} end do
+        delete_tracks_from_playlist: fn _, _, "snapshot2", _ -> {:ok, "snapshot3"} end,
+        validate_uri: fn _ -> {:ok, :track} end do
         conn =
           conn
           |> assign(:spotify, :no_refresh)

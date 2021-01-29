@@ -24,4 +24,7 @@ defmodule PlaylistLog.MusicClient do
               playlist_id :: String.t(),
               track_uris :: list(String.t())
             ) :: {:ok, String.t()} | {:error, {Module.t(), any}}
+
+  @callback validate_uri(maybe_uri :: String.t()) ::
+              {:ok, :track | :album | :artist} | {:error, :invalid_format}
 end
