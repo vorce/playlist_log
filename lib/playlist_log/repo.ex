@@ -65,13 +65,6 @@ defmodule PlaylistLog.Repo do
   defp to_map(%{__struct__: _} = struct), do: Map.from_struct(struct)
   defp to_map(map) when is_map(map), do: map
 
-  def update(Log = module, user_id, logs, update_fn) when is_list(logs) do
-    Enum.each(logs, fn log ->
-      key = key(module, {user_id, log.id})
-      CubDB.update(@cubdb, key, log, fn existing -> update_fn.(existing, log) end)
-    end)
-  end
-
   def insert(Log = module, user_id, logs) do
     Enum.each(logs, fn log ->
       CubDB.put(@cubdb, key(module, {user_id, log.id}), to_map(log))
@@ -88,7 +81,9 @@ defmodule PlaylistLog.Repo do
     Logger.info("Adding event from changeset #{inspect(key: key, value: event)}")
 
     CubDB.update(@cubdb, key, [event], fn existing ->
-      [event | existing]
+      Enum.uniq_by([event | existing], fn e ->
+        {e.timestamp, e.type, e.track_artist, e.track_name}
+      end)
     end)
   end
 
@@ -98,7 +93,16 @@ defmodule PlaylistLog.Repo do
     Logger.info("Adding event #{inspect(key: key, value: event)}")
 
     CubDB.update(@cubdb, key, [event], fn existing ->
-      [event | existing]
+      Enum.uniq_by([event | existing], fn e ->
+        {e.timestamp, e.type, e.track_artist, e.track_name}
+      end)
+    end)
+  end
+
+  def update(Log = module, user_id, logs, update_fn) when is_list(logs) do
+    Enum.each(logs, fn log ->
+      key = key(module, {user_id, log.id})
+      CubDB.update(@cubdb, key, log, fn existing -> update_fn.(existing, log) end)
     end)
   end
 

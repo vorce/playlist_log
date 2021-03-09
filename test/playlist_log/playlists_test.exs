@@ -86,6 +86,48 @@ defmodule PlaylistLog.PlaylistsTest do
 
       assert length(log.events) == events_from_storage + events_from_spotify
     end
+
+    test "does not add duplicate TRACK_ADDED events" do
+      # log with more events than tracks in playlist
+      log_id = "no-duplicate-TRACK_ADDED"
+      user = %{"id" => @user_id}
+      events_in_storage = 1..35 |> Enum.map(&event(&1, log_id))
+
+      # This event will be in storage, AND will also be an event based on the
+      # playlist from spotify.
+      existing_event = %PlaylistLog.Playlists.Event{
+        id: nil,
+        log_id: log_id,
+        timestamp: ~U[2016-10-11 13:44:40Z],
+        track_artist: "Zion & Lennox, J Balvin",
+        track_name: "Otra Vez (feat. J Balvin)",
+        track_uri: "spotify:track:7pk3EpFtmsOdj8iUhjmeCM",
+        type: "TRACK_ADDED",
+        user: "spotify_españa"
+      }
+
+      events_in_storage = [existing_event | events_in_storage]
+
+      Enum.each(events_in_storage, &PlaylistLog.Repo.insert(Event, log_id, &1))
+      log = %Log{log(log_id, @user_id) | events: events_in_storage, track_count: 0}
+      PlaylistLog.Repo.insert(Log, @user_id, [log])
+
+      assert length(log.events) == length(events_in_storage)
+
+      # get_log triggers additions of any events it thinks is missing from the event store.
+      {:ok, _get_log} = Playlists.get_log(user, log_id, "token")
+
+      {:ok, all_events} =
+        PlaylistLog.Repo.all(PlaylistLog.Playlists.Event, log_id, max_events: 10000)
+
+      events_for_existing =
+        Enum.filter(all_events, fn e ->
+          e.track_uri == existing_event.track_uri && e.timestamp == existing_event.timestamp &&
+            e.type == existing_event.type
+        end)
+
+      assert length(events_for_existing) == 1
+    end
   end
 
   describe "delete_tracks/5" do
@@ -139,7 +181,7 @@ defmodule PlaylistLog.PlaylistsTest do
               %{
                 artist: _,
                 name: _,
-                uri: uri
+                uri: ^uri
               }} = Playlists.add_track(existing_log, uri, "token")
     end
   end
