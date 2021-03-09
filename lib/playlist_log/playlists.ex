@@ -94,6 +94,9 @@ defmodule PlaylistLog.Playlists do
     end
   end
 
+  # The use case this function tries to handle is:
+  # 1. to add events for playlists that have not been managed with playlist_log ever before.
+  # 2. to sync playlist_log event store with additions that has been done in the spotify client
   defp unique_events(log_id, tracks, events) do
     track_added_events = Enum.map(tracks, &Event.from_track(log_id, &1))
     missing_events = missing_events(events, track_added_events)
