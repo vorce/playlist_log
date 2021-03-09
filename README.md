@@ -74,3 +74,9 @@ https://hexdocs.pm/cubdb/howto.html
 ## Screenshot
 
 ![Playlistlog screenshot](playlistlog_screenshot_2020-03-24.png?raw=true)
+
+## Migrations
+
+These live in `priv/migrations/` but are not run automatically.
+You need to run them from iex.
+
