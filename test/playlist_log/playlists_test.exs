@@ -118,7 +118,7 @@ defmodule PlaylistLog.PlaylistsTest do
       {:ok, _get_log} = Playlists.get_log(user, log_id, "token")
 
       {:ok, all_events} =
-        PlaylistLog.Repo.all(PlaylistLog.Playlists.Event, log_id, max_events: 10000)
+        PlaylistLog.Repo.all(PlaylistLog.Playlists.Event, log_id, max_events: 10_000)
 
       events_for_existing =
         Enum.filter(all_events, fn e ->
