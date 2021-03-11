@@ -1,4 +1,4 @@
-FROM hexpm/elixir:1.10.2-erlang-22.2.8-alpine-3.11.3 AS build
+FROM hexpm/elixir:1.11.3-erlang-23.2.7-alpine-3.13.2 AS build
 
 ARG SECRET_KEY_BASE
 ENV SECRET_KEY_BASE=$SECRET_KEY_BASE
@@ -38,7 +38,7 @@ RUN mix compile
 RUN mix release
 
 # prepare release image
-FROM alpine:3.11.3 AS app
+FROM alpine:3.13.2 AS app
 RUN apk add --update bash openssl
 
 # Unsure if the RUN command actually acomplishes anything, since when mounting
