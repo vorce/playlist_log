@@ -148,6 +148,18 @@ defmodule PlaylistLog.Spotify do
   end
 
   @doc """
+  Checks if a link is a valid spotify resource (uri or http link)
+  """
+  @impl PlaylistLog.MusicClient
+  def validate_track_link(maybe_link) do
+    case validate_uri(maybe_link) do
+      {:error, _} -> validate_link(maybe_link)
+      {:ok, {:track, uri}} -> {:ok, uri}
+      _ -> {:error, :invalid_track_link}
+    end
+  end
+
+  @doc """
   Checks if a string is a valid spotify uri.
 
   Example of valid uris:
@@ -156,13 +168,44 @@ defmodule PlaylistLog.Spotify do
     spotify:artist:3mvkWMe6swnknwscwvGCHO
     spotify:track:7lEptt4wbM0yJTvSG5EBof
   """
-  @impl PlaylistLog.MusicClient
   def validate_uri(maybe_uri) do
     case String.split(maybe_uri, ":", parts: 3) do
-      ["spotify", "track", _id] -> {:ok, :track}
-      ["spotify", "album", _id] -> {:ok, :album}
-      ["spotify", "artist", _id] -> {:ok, :artist}
+      ["spotify", "track", _id] -> {:ok, {:track, maybe_uri}}
+      ["spotify", "album", _id] -> {:ok, {:album, maybe_uri}}
+      ["spotify", "artist", _id] -> {:ok, {:artist, maybe_uri}}
       _ -> {:error, :invalid_format}
+    end
+  end
+
+  @doc """
+  Validates a spotify link like https://open.spotify.com/track/2azLsNFfIPtxNU4QmJzPow?si=85f957ef77854352
+  and turns it into a uri
+  """
+  def validate_link(maybe_link) do
+    with {:ok, {type, maybe_id}} <- parse_maybe_link(maybe_link),
+         {:ok, id} <- parse_link_id(maybe_id) do
+      {:ok, "spotify:#{type}:#{id}"}
+    end
+  end
+
+  defp parse_maybe_link(maybe_link) do
+    case String.split(maybe_link, "/", parts: 5) do
+      ["https:", "", "open.spotify.com", "track", id] ->
+        {:ok, {"track", id}}
+
+      ["https:", "", "open.spotify.com", "album", id] ->
+        {:ok, {"album", id}}
+
+      _ ->
+        {:error, :invalid_link_format}
+    end
+  end
+
+  defp parse_link_id(link_id) do
+    case String.split(link_id, "?si=", parts: 2) do
+      [id, _] -> {:ok, id}
+      [id] -> {:ok, id}
+      _ -> {:error, :invalid_link_id_format}
     end
   end
 
