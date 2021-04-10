@@ -211,7 +211,7 @@ defmodule PlaylistLog.Playlists do
   end
 
   def add_track(%Log{} = log, track_uri, access_token) do
-    with {:ok, :track} <- spotify().validate_uri(track_uri),
+    with {:ok, track_uri} <- spotify().validate_track_link(track_uri),
          {:ok, raw_track} <- spotify().get_track(track_uri, access_token),
          {:ok, new_snapshot_id} <-
            spotify().add_tracks_to_playlist(access_token, log.id, [track_uri]),

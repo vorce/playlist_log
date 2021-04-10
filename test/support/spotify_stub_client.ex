@@ -213,8 +213,8 @@ defmodule PlaylistLog.Test.SpotifyStubClient do
   end
 
   @impl PlaylistLog.MusicClient
-  def validate_uri(_uri) do
-    {:ok, :track}
+  def validate_track_link(uri) do
+    {:ok, uri}
   end
 
   @get_track_response """
