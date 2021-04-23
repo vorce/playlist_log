@@ -9,17 +9,17 @@
 
 <div class="row">
   <div class="column column-60">
-    <h3 badge="<%= length(@ordered_tracks) %>">Current tracks</h3>
+    <h3 badge="<%= length(@ordered_tracks) %>">Current songs</h3>
 
     <div class="row">
       <div class="column column-50">
         <%= form_for :track, Routes.log_path(@conn, :add_track, @log.id), fn f -> %>
           <fieldset>
-            <%= label f, :uri, "Spotify URI" %>
-            <%= text_input f, :uri, value: "", placeholder: "spotify:track:2oi3gjrmsdb8GpcgtH9Mn6" %>
-            <%= submit "Add track", method: :post %>
+            <%= label f, :uri, "Spotify song link" %>
+            <%= text_input f, :uri, value: "", placeholder: "https://open.spotify.com/track/5NmTEShk5mB5YFSRxC4nII?si=c8dc9ce85bc34474" %>
+            <%= submit "Add song", method: :post %>
             <div class="float-right">
-              <%= checkbox f, :remove_oldest, value: "false" %> <%= label f, :remove_oldest, "Remove oldest track afterwards", class: "label-inline" %>
+              <%= checkbox f, :remove_oldest, value: "false" %> <%= label f, :remove_oldest, "Remove oldest song afterwards", class: "label-inline" %>
             </div>
           </fieldset>
         <% end %>
