@@ -20,11 +20,22 @@ There is currently a public running instance of Playlistlog on https://playlistl
 - Overview of current songs in playlist + changes for the playlist (changes are either track additions or removals)
 - In the playlist overview you can add and delete tracks to/from the playlist, doing this will create new changes/events.
 
+I wrote a [blog post](https://forvillelser.vorce.se/posts/2021-03-11-statistics-from-using-playlistlog-for-over-a-year.html) about what using playlistlog enables me to do.
+
+## Run locally
+
+- `mix deps.get`
+- `SPOTIFY_CLIENT_ID=... SPOTIFY_CLIENT_SECRET=... SPOTIFY_REDIRECT_URI=http://localhost:4000/spotify_callback iex -S mix phx.server`
+- Go to `http://localhost:4000`
+
+The spotify client credentials are set up on the [Spotify developer Dashboard](https://developer.spotify.com/dashboard/).
+
 ## Docker
 
 Docker images are published to: https://hub.docker.com/r/vorce/playlistlog
 
 Example run:
+
 ```bash
 docker run --name playlistlog -d -p 4000:4000 -e SECRET_KEY_BASE=... -e SPOTIFY_CLIENT_ID=... -e SPOTIFY_CLIENT_SECRET=... -e SPOTIFY_REDIRECT_URI=http://localhost:4000/spotify_callback -v /var/run/docker.sock:/var/run/docker.sock vorce/playlistlog:latest /app/bin/playlist_log start
 ```
@@ -57,7 +68,6 @@ Enum.each(events, fn e -> PlaylistLog.Repo.insert(PlaylistLog.Playlists.Event, "
 
 See [github issues](https://github.com/vorce/playlist_log/issues)
 
-
 ## Storage details
 
 CubDB
@@ -79,4 +89,3 @@ https://hexdocs.pm/cubdb/howto.html
 
 These live in `priv/migrations/` but are not run automatically.
 You need to run them from iex.
-
