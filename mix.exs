@@ -50,7 +50,7 @@ defmodule PlaylistLog.MixProject do
       {:navigation_history, "~> 0.3"},
       {:con_cache, "~> 1.0"},
       {:uuid, "~> 1.1"},
-      {:bypass, "~> 1.0", only: :test},
+      {:bypass, "~> 2.1", only: :test},
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.10", only: :dev, runtime: false},
       {:mock, "~> 0.3", only: :test}
