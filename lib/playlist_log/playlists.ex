@@ -243,7 +243,7 @@ defmodule PlaylistLog.Playlists do
   end
 
   def events_between(log_id, date_range, opts \\ []) do
-    filter_fn = Keyword.get(opts, :filter_fn, fn e -> e end)
+    filter_fn = Keyword.get(opts, :filter_fn, fn _ -> true end)
     min_key = {:event, log_id, Date.to_iso8601(date_range.first, :basic)}
     max_key = {:event, log_id, Date.to_iso8601(date_range.last, :basic)}
 
