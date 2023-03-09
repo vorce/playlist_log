@@ -11,7 +11,6 @@ defmodule PlaylistLog.Playlists do
   alias PlaylistLog.Playlists.Log
   alias PlaylistLog.Playlists.Track
 
-  # Spotify client from config
   defp spotify(), do: Application.get_env(:playlist_log, PlaylistLog.Playlists)[:spotify_client]
 
   @doc """
@@ -241,5 +240,15 @@ defmodule PlaylistLog.Playlists do
   def create_event(log_id, %{} = attrs) do
     changeset = Event.changeset(%Event{}, attrs)
     Repo.insert(Event, log_id, changeset)
+  end
+
+  def events_between(log_id, date_range, opts \\ []) do
+    filter_fn = Keyword.get(opts, :filter_fn, fn _ -> true end)
+    min_key = {:event, log_id, Date.to_iso8601(date_range.first, :basic)}
+    max_key = {:event, log_id, Date.to_iso8601(date_range.last, :basic)}
+
+    with {:ok, events} <- Repo.all(Event, log_id, cubdb: [min_key: min_key, max_key: max_key]) do
+      {:ok, Enum.filter(events, filter_fn)}
+    end
   end
 end

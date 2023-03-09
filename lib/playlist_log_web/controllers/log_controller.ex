@@ -1,6 +1,6 @@
 defmodule PlaylistLogWeb.LogController do
   use PlaylistLogWeb, :controller
-  plug PlaylistLogWeb.Plugs.SpotifyAuth
+  plug(PlaylistLogWeb.Plugs.SpotifyAuth)
 
   require Logger
 
@@ -49,18 +49,36 @@ defmodule PlaylistLogWeb.LogController do
     spotify_access_token = conn.cookies["spotify_access_token"]
 
     with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token),
-         ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2) do
+         ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2),
+         {:ok, old_events} <- get_old_events(log.id, 3) do
       render(conn, "show.html",
         log: log,
         ordered_tracks: ordered_tracks,
         show_events: show_events,
-        subtitle: log.name
+        subtitle: log.name,
+        old_events: old_events
       )
     else
       {:error, reason} ->
         conn
         |> put_flash(:error, "Unable to show playlist: #{inspect(reason)}")
         |> redirect(to: Routes.log_path(conn, :index))
+    end
+  end
+
+  defp get_old_events(log_id, limit) do
+    one_year_ago = Date.add(Date.utc_today(), -365)
+    one_year_and_week_ago = Date.add(one_year_ago, -7)
+    date_range = Date.range(one_year_and_week_ago, one_year_ago)
+    filter_fn = fn e -> e.type == "TRACK_REMOVED" end
+
+    with {:ok, events} <- Playlists.events_between(log_id, date_range, filter_fn: filter_fn) do
+      limited_events =
+        events
+        |> Enum.sort_by(fn e -> e.timestamp end, {:desc, DateTime})
+        |> Enum.take(limit)
+
+      {:ok, limited_events}
     end
   end
 

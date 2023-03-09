@@ -9,7 +9,26 @@
 
 <div class="row">
   <div class="column column-60">
-    <h3 badge="<%= length(@ordered_tracks) %>">Current songs</h3>
+
+  <%= if @old_events != [] do %>
+    <h3>Songs from last year</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Artist</th>
+          <th>Removed on</th>
+        </tr>
+      </thead>
+      <tbody class="track-listing">
+    <%= for event <- @old_events do
+      render "old_event.html", event: event, log_id: @log.id, conn: @conn
+    end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <h3>Add song</h3>
 
     <div class="row">
       <div class="column column-50">
@@ -25,6 +44,8 @@
         <% end %>
       </div>
     </div>
+
+  <h3 badge="<%= length(@ordered_tracks) %>">Current songs</h3>
 
     <table>
       <thead>

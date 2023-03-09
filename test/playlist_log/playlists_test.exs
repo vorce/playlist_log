@@ -186,6 +186,29 @@ defmodule PlaylistLog.PlaylistsTest do
     end
   end
 
+  describe "events_between/3" do
+    test "get events within date range" do
+      log_id = "events_between"
+      uri = "spotify:track:1"
+      user_id = "user_3"
+      expected_event = event(user_id, log_id, timestamp: ~U[2020-01-02 00:00:00Z])
+
+      events = [
+        event(user_id, log_id, timestamp: ~U[2020-01-01 10:00:00Z]),
+        expected_event,
+        event(user_id, log_id, timestamp: ~U[2020-01-04 00:00:00Z])
+      ]
+
+      Enum.each(events, &PlaylistLog.Repo.insert(Event, log_id, &1))
+
+      assert Playlists.events_between(log_id, Date.range(~D[2020-01-02], ~D[2020-01-03])) ==
+               {:ok,
+                [
+                  expected_event
+                ]}
+    end
+  end
+
   defp log(id, owner) do
     Log.new(%{"id" => id, "name" => id, "owner" => %{"id" => owner}})
   end
@@ -194,16 +217,18 @@ defmodule PlaylistLog.PlaylistsTest do
     %Track{uri: uri, name: name, artists: [%{"name" => "artist_#{name}"}]}
   end
 
-  defp event(id, log_id) do
-    %Event{
+  defp event(id, log_id, opts \\ []) do
+    default_values = [
       id: id,
+      log_id: log_id,
       timestamp: DateTime.utc_now(),
       type: "TRACK_ADDED",
       user: id,
-      log_id: log_id,
       track_uri: id,
       track_name: id,
       track_artist: id
-    }
+    ]
+
+    Event.__struct__(Keyword.merge(default_values, opts))
   end
 end
