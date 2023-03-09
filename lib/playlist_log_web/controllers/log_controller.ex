@@ -47,8 +47,6 @@ defmodule PlaylistLogWeb.LogController do
     show_events = Map.get(params, "show_events", "all")
     spotify_user = get_session(conn, :spotify_user)
     spotify_access_token = conn.cookies["spotify_access_token"]
-    one_year_ago = Date.add(Date.utc_today(), -365)
-    one_year_and_week_ago = Date.add(one_year_ago, -7)
 
     with {:ok, log} <- Playlists.get_log(spotify_user, id, spotify_access_token),
          ordered_tracks <- Enum.sort(log.tracks, &latest_first_order/2),
