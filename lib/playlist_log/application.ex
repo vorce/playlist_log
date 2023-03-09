@@ -5,7 +5,7 @@ defmodule PlaylistLog.Application do
 
   use Application
 
-  @cubdb_data_dir Application.get_env(:playlist_log, PlaylistLog.Repo)[:data_dir]
+  @cubdb_data_dir Application.compile_env(:playlist_log, PlaylistLog.Repo)[:data_dir]
 
   def start(_type, _args) do
     children = [

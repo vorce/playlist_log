@@ -1,0 +1,5 @@
+<tr>
+    <td><%= content_tag :a, @event.track_name, href: @event.track_uri %></td>
+    <td><%= @event.track_artist %></td>
+    <td><%= DateTime.to_date(@event.timestamp) %></td>
+</tr>
