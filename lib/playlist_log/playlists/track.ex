@@ -55,6 +55,6 @@ defmodule PlaylistLog.Playlists.Track do
   def artist_string(%{"artists" => nil}), do: ""
 
   def artist_string(%{"artists" => artists}) do
-    artists |> Enum.map(fn artist -> artist["name"] end) |> Enum.join(", ")
+    artists |> Enum.map_join(fn artist -> artist["name"] end, ", ")
   end
 end
