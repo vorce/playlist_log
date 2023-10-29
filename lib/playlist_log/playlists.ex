@@ -48,9 +48,8 @@ defmodule PlaylistLog.Playlists do
 
   """
   def list_logs(user) do
-    with {:ok, user_id} <- Map.fetch(user, "id"),
-         {:ok, logs} <- Repo.all(Log, user_id) do
-      {:ok, logs}
+    with {:ok, user_id} <- Map.fetch(user, "id") do
+      Repo.all(Log, user_id)
     end
   end
 
