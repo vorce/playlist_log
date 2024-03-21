@@ -8,6 +8,7 @@ defmodule PlaylistLog.Spotify do
   # https://developer.spotify.com/documentation/general/guides/scopes/
 
   @base_url "https://api.spotify.com/v1"
+  @ok_status [200, 201]
 
   @doc """
   Get all user's playlists. Note: This will page through spotify's API to get ALL lists.
@@ -103,7 +104,8 @@ defmodule PlaylistLog.Spotify do
   @doc """
   Add tracks to a playlist
 
-  - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/add-tracks-to-playlist/
+  - Official docs: https://developer.spotify.com/documentation/web-api/reference/reorder-or-replace-playlists-tracks
+  These docs changed at some point after the initial implementation.
   """
   @impl PlaylistLog.MusicClient
   def add_tracks_to_playlist(access_token, playlist_id, track_uris) do
@@ -115,7 +117,8 @@ defmodule PlaylistLog.Spotify do
     }
 
     with {:ok, request_body} <- Jason.encode(payload),
-         {:ok, %HTTPoison.Response{status_code: 201, body: response_body}} <-
+         {:ok, %HTTPoison.Response{status_code: status, body: response_body}}
+         when status in @ok_status <-
            HTTPoison.post(url, request_body, headers),
          {:ok, response} <- Jason.decode(response_body) do
       {:ok, response["snapshot_id"]}
