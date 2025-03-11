@@ -81,13 +81,16 @@ defmodule PlaylistLog.Spotify do
   - Official docs: https://developer.spotify.com/documentation/web-api/reference/playlists/remove-tracks-playlist/
   """
   @impl PlaylistLog.MusicClient
-  def delete_tracks_from_playlist(access_token, playlist_id, snapshot_id, track_uris) do
+  def delete_tracks_from_playlist(access_token, playlist_id, _snapshot_id, track_uris) do
     headers = [Authorization: "Bearer #{access_token}", "Content-type": "application/json"]
     url = @base_url <> "/playlists/#{playlist_id}/tracks"
 
+    # Remove snapshot_id due to comments on:
+    # https://community.spotify.com/t5/Spotify-for-Developers/Getting-502-response-on-DELETE-for-playlist-lt-playlistid-tracks/m-p/6736837
+    # I've been getting 502 errors when deleting tracks.
     payload = %{
-      tracks: Enum.map(track_uris, fn uri -> %{uri: uri} end),
-      snapshot_id: snapshot_id
+      tracks: Enum.map(track_uris, fn uri -> %{uri: uri} end)
+      # snapshot_id: snapshot_id
     }
 
     with {:ok, request_body} <- Jason.encode(payload),
@@ -104,7 +107,7 @@ defmodule PlaylistLog.Spotify do
   @doc """
   Add tracks to a playlist
 
-  - Official docs: https://developer.spotify.com/documentation/web-api/reference/reorder-or-replace-playlists-tracks
+  - Official docs: https://developer.spotify.com/documentation/web-api/reference/add-tracks-to-playlist
   These docs changed at some point after the initial implementation.
   """
   @impl PlaylistLog.MusicClient
